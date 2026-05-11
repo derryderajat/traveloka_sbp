@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -40,6 +39,7 @@
             display: none; 
             min-height: 100vh;
             padding-bottom: 80px; 
+            background: #f5f5f5; /* Match app background */
         }
         .screen.active { display: block; }
 
@@ -56,7 +56,7 @@
             gap: 15px; 
         }
         
-        .card { background: white; margin: 12px; padding: 15px; border-radius: 8px; }
+        .card { background: white; margin: 12px; padding: 15px; border-radius: 12px; } /* Rounded corners like app */
         .input-group { margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 8px; position: relative; }
         .input-group label { display: block; font-size: 11px; color: var(--tv-light); font-weight: 600; text-transform: uppercase; }
         .input-group div { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
@@ -105,27 +105,141 @@
         .ticket-head { background: var(--tv-dark); color: white; padding: 15px; text-align: center; }
         .ticket-body { padding: 20px; position: relative; }
         .ticket-dash { border-top: 1px dashed #ddd; margin: 15px 0; }
+        
+        /* HOME FIXES */
+        .home-top-bg {
+            background: var(--tv-blue);
+            height: 180px;
+            border-radius: 0 0 30px 30px; /* Curve the bottom */
+            padding: 20px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 0;
+        }
+        .home-header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            align-items: center;
+            padding: 20px;
+            margin-top: 10px;
+        }
+        
+        .main-menu-grid {
+            background: white;
+            border-radius: 16px;
+            margin: 10px 15px;
+            padding: 20px 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .menu-item { text-align: center; font-size: 11px; font-weight: 600; color: var(--tv-text); cursor: pointer;}
+        .menu-icon { width: 45px; height: 45px; border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;}
+        
+        /* Correct Smart Banner */
+        .smart-banner-correct {
+            margin: 15px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0194f3 0%, #015fa0 100%);
+            padding: 20px;
+            color: white;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(1, 148, 243, 0.3);
+            z-index: 2;
+        }
+        .smart-banner-correct::after {
+             /* Abstract shape decoration */
+             content: '';
+             position: absolute;
+             right: -20px;
+             bottom: -20px;
+             width: 100px;
+             height: 100px;
+             background: rgba(255,255,255,0.1);
+             transform: rotate(45deg);
+        }
+        .smart-banner-correct h3 { font-size: 18px; margin-bottom: 5px; position: relative; z-index: 2;}
+        .smart-banner-correct p { font-size: 12px; opacity: 0.9; margin-bottom: 12px; position: relative; z-index: 2;}
+        .btn-smart {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+        }
+        
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; background: white; border-top: 1px solid var(--border); display: flex; padding: 10px 0; z-index: 200; justify-content: space-around;}
+        .nav-tab { text-align: center; color: var(--tv-light); font-size: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;}
+        .nav-tab.active { color: var(--tv-blue); font-weight: bold;}
+        .nav-tab i { font-size: 20px; }
+        
     </style>
 </head>
 <body>
 
 <div class="app-wrapper">
     
-    <!-- SCREEN 1: HOME -->
     <div id="scr-home" class="screen active">
-        <div style="background: var(--tv-blue); padding: 50px 20px 20px;">
-            <h2 style="color:white; font-size: 24px;">traveloka</h2>
+        <div class="home-top-bg"></div>
+        
+        <div class="home-header-content">
+            <div style="font-size:24px; font-weight:bold;">traveloka</div>
+            <div style="display:flex; gap:15px; font-size:20px;">
+                <i class="fa-solid fa-percent"></i>
+                <i class="fa-regular fa-bell"></i>
+            </div>
         </div>
-        <div class="card" onclick="showScreen('scr-form')" style="background: linear-gradient(135deg, #0194f3, #015fa0); color: white; cursor: pointer; margin-top: -30px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-            <h3 style="margin-bottom:5px;">Smart Budget Planning</h3>
-            <p style="font-size: 13px; opacity: 0.9;">Liburan impian, budget aman. Coba sekarang!</p>
-            <i class="fa-solid fa-magic-wand-sparkles" style="position: absolute; right: 20px; top: 20px; font-size: 40px; opacity: 0.3;"></i>
+        
+        <div class="main-menu-grid">
+            <div class="menu-item"><div class="menu-icon" style="background:#0194f3"><i class="fa-solid fa-plane"></i></div>Tiket Pesawat</div>
+            <div class="menu-item"><div class="menu-icon" style="background:#235d9f"><i class="fa-solid fa-hotel"></i></div>Hotel</div>
+            <div class="menu-item"><div class="menu-icon" style="background:#42b549"><i class="fa-solid fa-train"></i></div>Tiket Kereta</div>
+            <div class="menu-item"><div class="menu-icon" style="background:#f5a623"><i class="fa-solid fa-bus"></i></div>Bus & Travel</div>
+            <div class="menu-item"><div class="menu-icon" style="background:#ff5e1f"><i class="fa-solid fa-utensils"></i></div>Kuliner</div>
+            <div class="menu-item"><div class="menu-icon" style="background:#00d1ce"><i class="fa-solid fa-ticket"></i></div>Xperience</div>
+            <div class="menu-item"><div class="menu-icon" style="background:#9b59b6"><i class="fa-solid fa-car"></i></div>Rental Mobil</div>
+            <div class="menu-item"><div class="menu-icon" style="background:#687176"><i class="fa-solid fa-ellipsis"></i></div>Lainnya</div>
         </div>
-        <div style="padding: 20px; font-weight: bold;">Inspirasi Destinasi</div>
-        <div class="card" style="height: 150px; background: url('https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=400&q=80') center/cover; border-radius: 12px;"></div>
+
+        <div class="smart-banner-correct" onclick="showScreen('scr-form')">
+            <h3>Smart Budget Planning</h3>
+            <p>Rencanakan liburan impian sesuai budget Anda secara otomatis. Coba Sekarang!</p>
+            <button class="btn-smart">Mulai Perencanaan <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+
+        <div style="padding: 10px 15px 0;">
+            <h4 style="margin-bottom:10px;">Promo Terpopuler</h4>
+            <div class="card" style="height: 150px; background: url('https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=400&q=80') center/cover; border-radius: 12px; margin: 0; border: none;"></div>
+            <br><br><br><br> </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-tab active"><i class="fa-solid fa-house"></i>Awal</div>
+            <div class="nav-tab"><i class="fa-solid fa-compass"></i>Simpan</div>
+            <div class="nav-tab"><i class="fa-solid fa-list-ul"></i>Pesanan</div>
+            <div class="nav-tab"><i class="fa-solid fa-user"></i>Akun</div>
+        </div>
     </div>
 
-    <!-- SCREEN 2: FORM -->
     <div id="scr-form" class="screen">
         <div class="tv-header">
             <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-home')"></i>
@@ -181,7 +295,6 @@
         </div>
     </div>
 
-    <!-- SCREEN 3: RESULTS -->
     <div id="scr-results" class="screen">
         <div class="tv-header">
             <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-form')"></i>
@@ -195,7 +308,6 @@
         <div id="results-list"></div>
     </div>
 
-    <!-- SCREEN 4: BOOKING -->
     <div id="scr-booking" class="screen">
         <div class="tv-header">
             <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-results')"></i>
@@ -203,15 +315,13 @@
         </div>
         
         <div class="card" id="booking-pax-list">
-            <!-- Dynamic Content -->
-        </div>
+            </div>
 
         <div style="padding:15px;">
             <button class="btn-orange" onclick="showScreen('scr-payment')">Lanjut ke Pembayaran</button>
         </div>
     </div>
 
-    <!-- SCREEN 5: PAYMENT -->
     <div id="scr-payment" class="screen">
         <div class="tv-header">
             <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-booking')"></i>
@@ -221,8 +331,7 @@
         <div class="card">
             <div style="font-weight:bold; margin-bottom:15px;">Pilih Metode Pembayaran</div>
             <div id="payment-methods-list">
-                <!-- Dynamic Content -->
-            </div>
+                </div>
         </div>
 
         <div style="padding:15px;">
@@ -230,7 +339,6 @@
         </div>
     </div>
 
-    <!-- SCREEN 6: GUIDE / VA -->
     <div id="scr-guide" class="screen">
         <div class="tv-header">
             <i class="fa-solid fa-xmark" onclick="showScreen('scr-payment')"></i>
@@ -238,15 +346,13 @@
         </div>
         
         <div id="guide-body">
-            <!-- Dynamic Content -->
-        </div>
+            </div>
 
         <div style="padding:15px; position:fixed; bottom:0; width:100%; max-width:480px; background:white; border-top:1px solid #ddd;">
             <button class="btn-orange" onclick="finalizeBooking()">SAYA SUDAH BAYAR</button>
         </div>
     </div>
 
-    <!-- SCREEN 7: TICKET -->
     <div id="scr-ticket" class="screen">
         <div style="text-align:center; padding:40px 20px 20px;">
             <i class="fa-solid fa-circle-check" style="font-size:60px; color:#22c55e;"></i>
@@ -275,7 +381,6 @@
         </div>
     </div>
 
-    <!-- MODAL: PASSENGERS -->
     <div id="modal-pax" class="modal-overlay">
         <div class="modal-content">
             <h3 style="margin-bottom:20px;">Jumlah Penumpang</h3>
@@ -321,7 +426,6 @@
         </div>
     </div>
 
-    <!-- MODAL: PAX DETAILS -->
     <div id="modal-pax-detail" class="modal-overlay">
         <div class="modal-content">
             <h3 id="pax-detail-title" style="margin-bottom:20px;">Lengkapi Data Penumpang</h3>
@@ -564,7 +668,7 @@
             };
             payList.appendChild(opt);
         });
-    </div>
+    }
 
     // PAX DETAIL MODAL
     function openDetailModal(type, index) {
