@@ -1,0 +1,63 @@
+{
+    "BCA_VA": {
+        "title": "BCA Virtual Account",
+        "type": "virtual_account",
+        "account_number": "80777 081234567890",
+        "instructions": [
+            "Login ke m-BCA.",
+            "Pilih menu 'm-Transfer' > 'BCA Virtual Account'.",
+            "Masukkan nomor BCA Virtual Account di atas.",
+            "Periksa kembali nominal pembayaran dan nama merchant (Traveloka).",
+            "Masukkan PIN m-BCA Anda untuk konfirmasi.",
+            "Simpan bukti pembayaran."
+        ]
+    },
+    "MANDIRI_VA": {
+        "title": "Mandiri Virtual Account",
+        "type": "virtual_account",
+        "account_number": "89808 081234567890",
+        "instructions": [
+            "Login ke Livin' by Mandiri.",
+            "Pilih menu 'Bayar' > 'E-Commerce'.",
+            "Pilih penyedia jasa 'Traveloka'.",
+            "Masukkan nomor Mandiri Virtual Account di atas.",
+            "Konfirmasi nominal tagihan dan masukkan PIN Livin' Anda.",
+            "Pembayaran selesai."
+        ]
+    },
+    "OVO": {
+        "title": "Dompet Digital OVO",
+        "type": "e_wallet",
+        "phone_number": "0812-3456-7890",
+        "instructions": [
+            "Buka aplikasi OVO di HP Anda.",
+            "Klik ikon Lonceng / Notifikasi di pojok kanan atas.",
+            "Pilih tagihan pembayaran dari Traveloka.",
+            "Pastikan OVO Cash Anda mencukupi.",
+            "Klik 'Bayar' dan masukkan Security Code OVO Anda."
+        ]
+    },
+    "GOPAY": {
+        "title": "GoPay",
+        "type": "e_wallet",
+        "phone_number": "0812-3456-7890",
+        "instructions": [
+            "Buka aplikasi Gojek di HP Anda.",
+            "Akan muncul pop-up tagihan dari Traveloka, atau cek menu Notifikasi.",
+            "Pastikan saldo GoPay Anda mencukupi.",
+            "Klik 'Bayar' pada rincian tagihan.",
+            "Masukkan PIN GoPay Anda."
+        ]
+    },
+    "CC": {
+        "title": "Kartu Kredit (Visa/Mastercard/JCB)",
+        "type": "credit_card",
+        "instructions": [
+            "Masukkan nomor kartu kredit 16 digit Anda pada form yang disediakan.",
+            "Masukkan masa berlaku kartu (Bulan/Tahun).",
+            "Masukkan 3 digit kode CVV yang ada di belakang kartu.",
+            "Klik 'Bayar'. Anda akan diarahkan ke halaman otentikasi bank.",
+            "Masukkan kode OTP yang dikirimkan melalui SMS oleh bank penerbit kartu."
+        ]
+    }
+}
