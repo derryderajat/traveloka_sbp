@@ -214,6 +214,17 @@
         .nav-tab.active { color: var(--tv-blue); font-weight: bold;}
         .nav-tab i { font-size: 20px; }
         
+        /* PRINT STYLES */
+        @media print {
+            body { background: white; }
+            .app-wrapper { box-shadow: none; }
+            .screen { padding-bottom: 0 !important; }
+            .btn-orange, .btn-outline, .tv-header { display: none; }
+            .card { page-break-inside: avoid; margin: 0; padding: 15px; border: 1px solid #ddd; margin-bottom: 15px; }
+            .ticket-head { background: #0194f3 !important; color: white; }
+        }
+        
+        
     </style>
 <base target="_blank">
 </head>
@@ -402,24 +413,161 @@
             <p style="color:var(--tv-light); font-size:14px;">E-Tiket telah dikirim ke email Anda.</p>
         </div>
 
-        <div class="ticket-box">
-            <div class="ticket-head">
-                <div style="font-size:12px; opacity:0.8;">E-TICKET SMART BUNDLE</div>
-                <div style="font-size:18px; font-weight:bold; margin-top:4px;">#TV-8827100</div>
+        <!-- SMART BUNDLE TERPADU -->
+        <div class="card" style="margin-top:20px;">
+            <div style="text-align:center; padding-bottom:15px; border-bottom:2px solid var(--tv-blue);">
+                <div style="font-size:13px; color:var(--tv-light); font-weight:bold; text-transform:uppercase;">E-Tiket Terpadu</div>
+                <div id="tick-booking-number" style="font-size:24px; font-weight:bold; color:var(--tv-blue); margin-top:8px;">TV-0000001</div>
             </div>
-            <div class="ticket-body">
-                <div id="tick-route" style="font-weight:bold; font-size:16px;">Jakarta → Bangkok</div>
-                <div id="tick-dates" style="font-size:13px; color:var(--tv-light);">27 Agt - 04 Sep 2026</div>
-                <div class="ticket-dash"></div>
-                <div id="tick-services"></div>
-                <div class="ticket-dash"></div>
-                <div style="font-size:12px; color:var(--tv-light);">Total Penumpang</div>
-                <div id="tick-pax" style="font-weight:bold;">1 Dewasa</div>
+            
+            <div style="padding-top:15px;">
+                <div style="margin-bottom:15px;">
+                    <div style="font-size:13px; color:var(--tv-light);">Rute Perjalanan</div>
+                    <div id="tick-route" style="font-weight:bold; font-size:18px; color:var(--tv-text);">Jakarta → Bangkok</div>
+                </div>
+                
+                <div style="margin-bottom:15px;">
+                    <div style="font-size:13px; color:var(--tv-light);">Tanggal Perjalanan</div>
+                    <div id="tick-dates" style="font-size:14px; font-weight:bold; color:var(--tv-text);">27 Agt - 04 Sep 2026</div>
+                </div>
+                
+                <div style="margin-bottom:15px;">
+                    <div style="font-size:13px; color:var(--tv-light);">Penumpang</div>
+                    <div id="tick-pax" style="font-size:14px; font-weight:bold; color:var(--tv-text);">1 Dewasa</div>
+                </div>
+                
+                <div style="background:#f0f7ff; padding:12px; border-radius:6px; border-left:3px solid var(--tv-blue);">
+                    <div style="font-size:12px; color:var(--tv-light); margin-bottom:4px;">Total Harga</div>
+                    <div id="tick-total-price" style="font-size:18px; font-weight:bold; color:var(--tv-orange);">Rp 5.000.000</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INDIVIDUAL TICKETS -->
+        <div style="padding:15px 0;">
+            <div style="padding:0 15px; margin-bottom:20px;">
+                <h3 style="color:var(--tv-text); margin-bottom:15px;">Tiket Individual Per Layanan</h3>
+            </div>
+
+            <!-- FLIGHT TICKET -->
+            <div class="card" style="border-left:4px solid #0194f3;">
+                <div style="display:flex; gap:12px; align-items:start; margin-bottom:15px;">
+                    <i class="fa-solid fa-plane" style="font-size:24px; color:var(--tv-blue);"></i>
+                    <div style="flex:1;">
+                        <div style="font-size:13px; color:var(--tv-light); font-weight:bold;">TIKET TRANSPORTASI</div>
+                        <div id="tick-airline-name" style="font-size:16px; font-weight:bold; color:var(--tv-text);">Batik Air</div>
+                    </div>
+                </div>
+                
+                <div style="background:#f9f9f9; padding:12px; border-radius:6px; margin-bottom:12px; font-size:13px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="color:var(--tv-light);">Flight Type:</span>
+                        <span id="tick-flight-type" style="font-weight:bold;">Direct Flight</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:var(--tv-light);">Nomor Kursi:</span>
+                        <span id="tick-seat-number" style="font-weight:bold;">A1, A2, A3, A4</span>
+                    </div>
+                </div>
+                
+                <div style="padding:12px; background:linear-gradient(135deg, rgba(1,148,243,0.1) 0%, rgba(1,148,243,0.05) 100%); border-radius:6px; border:1px solid rgba(1,148,243,0.2);">
+                    <div style="font-size:12px; color:var(--tv-light); margin-bottom:4px;">Harga Tiket</div>
+                    <div id="tick-flight-price" style="font-size:18px; font-weight:bold; color:var(--tv-blue);">Rp 1.500.000</div>
+                </div>
+            </div>
+
+            <!-- HOTEL TICKET -->
+            <div class="card" style="border-left:4px solid #42b549;">
+                <div style="display:flex; gap:12px; align-items:start; margin-bottom:15px;">
+                    <i class="fa-solid fa-hotel" style="font-size:24px; color:#42b549;"></i>
+                    <div style="flex:1;">
+                        <div style="font-size:13px; color:var(--tv-light); font-weight:bold;">VOUCHER MENGINAP</div>
+                        <div id="tick-hotel-name" style="font-size:16px; font-weight:bold; color:var(--tv-text);">Four Seasons Resort</div>
+                    </div>
+                </div>
+                
+                <div style="background:#f9f9f9; padding:12px; border-radius:6px; margin-bottom:12px; font-size:13px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="color:var(--tv-light);">Tipe Kamar:</span>
+                        <span id="tick-room-type" style="font-weight:bold;">Suite Deluxe</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:var(--tv-light);">Malam Menginap:</span>
+                        <span id="tick-nights" style="font-weight:bold;">6 Malam</span>
+                    </div>
+                </div>
+                
+                <div style="padding:12px; background:linear-gradient(135deg, rgba(66,181,73,0.1) 0%, rgba(66,181,73,0.05) 100%); border-radius:6px; border:1px solid rgba(66,181,73,0.2);">
+                    <div style="font-size:12px; color:var(--tv-light); margin-bottom:4px;">Harga Akomodasi</div>
+                    <div id="tick-hotel-price" style="font-size:18px; font-weight:bold; color:#42b549;">Rp 2.400.000</div>
+                </div>
+            </div>
+
+            <!-- ACTIVITY TICKET -->
+            <div class="card" style="border-left:4px solid #ff5e1f;">
+                <div style="display:flex; gap:12px; align-items:start; margin-bottom:15px;">
+                    <i class="fa-solid fa-ticket" style="font-size:24px; color:var(--tv-orange);"></i>
+                    <div style="flex:1;">
+                        <div style="font-size:13px; color:var(--tv-light); font-weight:bold;">EXPERIENCE VOUCHER</div>
+                        <div id="tick-activity-name" style="font-size:16px; font-weight:bold; color:var(--tv-text);">Grand Palace Tour</div>
+                    </div>
+                </div>
+                
+                <div style="background:#f9f9f9; padding:12px; border-radius:6px; margin-bottom:12px; font-size:13px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="color:var(--tv-light);">Jenis Aktivitas:</span>
+                        <span id="tick-activity-type" style="font-weight:bold;">Guided Tour</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:var(--tv-light);">Peserta:</span>
+                        <span id="tick-activity-pax" style="font-weight:bold;">1 Orang</span>
+                    </div>
+                </div>
+                
+                <div style="padding:12px; background:linear-gradient(135deg, rgba(255,94,31,0.1) 0%, rgba(255,94,31,0.05) 100%); border-radius:6px; border:1px solid rgba(255,94,31,0.2);">
+                    <div style="font-size:12px; color:var(--tv-light); margin-bottom:4px;">Harga Aktivitas</div>
+                    <div id="tick-activity-price" style="font-size:18px; font-weight:bold; color:var(--tv-orange);">Rp 1.100.000</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INVOICE / PAYMENT PROOF -->
+        <div class="card" style="background:linear-gradient(135deg, #f0f7ff 0%, #f5f5f5 100%); border-left:4px solid var(--tv-blue);">
+            <div style="margin-bottom:12px;">
+                <div style="font-size:13px; color:var(--tv-light); font-weight:bold; text-transform:uppercase;">Bukti Pembayaran</div>
+            </div>
+            
+            <div style="background:white; padding:15px; border-radius:6px; margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid #eee;">
+                    <span style="font-size:13px; color:var(--tv-light);">Metode Pembayaran</span>
+                    <span id="tick-payment-method" style="font-weight:bold; font-size:13px;">Transfer Bank BCA</span>
+                </div>
+                
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid #eee;">
+                    <span style="font-size:13px; color:var(--tv-light);">Tanggal Pembayaran</span>
+                    <span id="tick-payment-date" style="font-weight:bold; font-size:13px;">12 Mei 2026</span>
+                </div>
+                
+                <div style="display:flex; justify-content:space-between; padding-bottom:10px; border-bottom:1px solid #eee;">
+                    <span style="font-size:13px; color:var(--tv-light);">Status</span>
+                    <span style="background:#22c55e; color:white; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:bold;">BERHASIL</span>
+                </div>
+                
+                <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                    <span style="font-size:13px; color:var(--tv-light);">Total Pembayaran</span>
+                    <span id="tick-invoice-total" style="font-weight:bold; font-size:16px; color:var(--tv-orange);">Rp 5.000.000</span>
+                </div>
+            </div>
+            
+            <div style="text-align:center; font-size:12px; color:var(--tv-light);">
+                <i class="fa-solid fa-check-circle" style="color:#22c55e; margin-right:8px;"></i>
+                Pembayaran Terkonfirmasi
             </div>
         </div>
 
         <div style="padding:15px;">
-            <button class="btn-orange" onclick="location.reload()">Selesai & Kembali ke Beranda</button>
+            <button class="btn-orange" onclick="location.reload()" style="margin-bottom:10px;">Selesai & Kembali ke Beranda</button>
+            <button class="btn-outline" style="width:100%" onclick="downloadTicket()"><i class="fa-solid fa-download" style="margin-right:8px;"></i>Unduh E-Tiket</button>
         </div>
     </div>
 
@@ -6210,6 +6358,198 @@
         showScreen('scr-guide');
     }
 
+    // DOWNLOAD E-TICKET
+    function downloadTicket() {
+        try {
+            // Extract all data from the ticket elements FIRST
+            const data = {
+                bookingNumber: document.getElementById('tick-booking-number')?.innerText || 'N/A',
+                route: document.getElementById('tick-route')?.innerText || 'N/A',
+                dates: document.getElementById('tick-dates')?.innerText || 'N/A',
+                pax: document.getElementById('tick-pax')?.innerText || 'N/A',
+                airlineName: document.getElementById('tick-airline-name')?.innerText || 'N/A',
+                flightType: document.getElementById('tick-flight-type')?.innerText || 'N/A',
+                seatNumber: document.getElementById('tick-seat-number')?.innerText || 'N/A',
+                flightPrice: document.getElementById('tick-flight-price')?.innerText || 'Rp 0',
+                hotelName: document.getElementById('tick-hotel-name')?.innerText || 'N/A',
+                roomType: document.getElementById('tick-room-type')?.innerText || 'N/A',
+                nights: document.getElementById('tick-nights')?.innerText || 'N/A',
+                hotelPrice: document.getElementById('tick-hotel-price')?.innerText || 'Rp 0',
+                activityName: document.getElementById('tick-activity-name')?.innerText || 'N/A',
+                activityType: document.getElementById('tick-activity-type')?.innerText || 'N/A',
+                activityPax: document.getElementById('tick-activity-pax')?.innerText || 'N/A',
+                activityPrice: document.getElementById('tick-activity-price')?.innerText || 'Rp 0',
+                paymentMethod: document.getElementById('tick-payment-method')?.innerText || 'N/A',
+                paymentDate: document.getElementById('tick-payment-date')?.innerText || 'N/A',
+                totalPrice: document.getElementById('tick-invoice-total')?.innerText || 'Rp 0'
+            };
+            
+            // Create print window with ALL data ready
+            const printWindow = window.open('', '_blank', 'height=600,width=800');
+            if (!printWindow) {
+                alert('Mohon izinkan pop-up untuk mengunduh e-tiket');
+                return;
+            }
+            
+            const printDoc = printWindow.document;
+            const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>E-Tiket - ${data.bookingNumber}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: white; padding: 40px 20px; }
+        .print-container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #0194f3; padding-bottom: 20px; }
+        .logo { font-size: 32px; font-weight: bold; color: #0194f3; margin-bottom: 15px; }
+        .title { font-size: 20px; font-weight: bold; margin: 10px 0; }
+        .booking-no { font-size: 16px; color: #687176; margin-top: 10px; }
+        .section-title { font-size: 15px; font-weight: bold; color: white; background: #0194f3; padding: 12px 15px; margin-top: 25px; margin-bottom: 15px; border-radius: 4px; }
+        .section { margin-bottom: 20px; border: 1px solid #ddd; padding: 20px; border-radius: 4px; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+        .row:last-child { border-bottom: none; }
+        .label { color: #687176; font-size: 13px; font-weight: 500; }
+        .value { font-weight: bold; color: #434343; font-size: 13px; }
+        .price { color: #ff5e1f; font-size: 16px; font-weight: bold; }
+        .status-success { color: white; background: #22c55e; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; }
+        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #687176; }
+        .footer-line { margin: 8px 0; }
+        @media print {
+            body { padding: 0; }
+            .print-container { margin: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-container">
+        <div class="header">
+            <div class="logo">🏪 Traveloka</div>
+            <div class="title">E-TIKET SMART BUNDLE</div>
+            <div class="booking-no">Booking #${data.bookingNumber}</div>
+        </div>
+        
+        <div class="section-title">📍 INFORMASI PERJALANAN</div>
+        <div class="section">
+            <div class="row">
+                <span class="label">Rute Perjalanan</span>
+                <span class="value">${data.route}</span>
+            </div>
+            <div class="row">
+                <span class="label">Tanggal Perjalanan</span>
+                <span class="value">${data.dates}</span>
+            </div>
+            <div class="row">
+                <span class="label">Penumpang</span>
+                <span class="value">${data.pax}</span>
+            </div>
+        </div>
+        
+        <div class="section-title">✈️ TIKET TRANSPORTASI</div>
+        <div class="section">
+            <div class="row">
+                <span class="label">Maskapai</span>
+                <span class="value">${data.airlineName}</span>
+            </div>
+            <div class="row">
+                <span class="label">Jenis Penerbangan</span>
+                <span class="value">${data.flightType}</span>
+            </div>
+            <div class="row">
+                <span class="label">Nomor Kursi</span>
+                <span class="value">${data.seatNumber}</span>
+            </div>
+            <div class="row">
+                <span class="label">Harga Tiket</span>
+                <span class="price">${data.flightPrice}</span>
+            </div>
+        </div>
+        
+        <div class="section-title">🏨 VOUCHER MENGINAP</div>
+        <div class="section">
+            <div class="row">
+                <span class="label">Hotel</span>
+                <span class="value">${data.hotelName}</span>
+            </div>
+            <div class="row">
+                <span class="label">Tipe Kamar</span>
+                <span class="value">${data.roomType}</span>
+            </div>
+            <div class="row">
+                <span class="label">Durasi Menginap</span>
+                <span class="value">${data.nights}</span>
+            </div>
+            <div class="row">
+                <span class="label">Harga Akomodasi</span>
+                <span class="price">${data.hotelPrice}</span>
+            </div>
+        </div>
+        
+        <div class="section-title">🎭 EXPERIENCE VOUCHER</div>
+        <div class="section">
+            <div class="row">
+                <span class="label">Aktivitas</span>
+                <span class="value">${data.activityName}</span>
+            </div>
+            <div class="row">
+                <span class="label">Jenis Aktivitas</span>
+                <span class="value">${data.activityType}</span>
+            </div>
+            <div class="row">
+                <span class="label">Peserta</span>
+                <span class="value">${data.activityPax}</span>
+            </div>
+            <div class="row">
+                <span class="label">Harga Aktivitas</span>
+                <span class="price">${data.activityPrice}</span>
+            </div>
+        </div>
+        
+        <div class="section-title">💳 BUKTI PEMBAYARAN</div>
+        <div class="section">
+            <div class="row">
+                <span class="label">Metode Pembayaran</span>
+                <span class="value">${data.paymentMethod}</span>
+            </div>
+            <div class="row">
+                <span class="label">Tanggal Pembayaran</span>
+                <span class="value">${data.paymentDate}</span>
+            </div>
+            <div class="row">
+                <span class="label">Status Pembayaran</span>
+                <span><span class="status-success">✓ BERHASIL</span></span>
+            </div>
+            <div class="row" style="border-bottom: 2px solid #0194f3; margin-top: 15px; padding-top: 15px;">
+                <span class="label" style="font-size: 14px; font-weight: bold;">TOTAL PEMBAYARAN</span>
+                <span class="price" style="font-size: 18px;">${data.totalPrice}</span>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-line">✓ Terima kasih telah mempercayai Traveloka!</div>
+            <div class="footer-line">Harap perlihatkan e-tiket ini kepada petugas di lokasi layanan.</div>
+            <div class="footer-line" style="margin-top: 15px; color: #999;">Waktu Cetak: ${new Date().toLocaleString('id-ID')}</div>
+        </div>
+    </div>
+</body>
+</html>
+            `;
+            
+            printDoc.write(htmlContent);
+            printDoc.close();
+            
+            // Trigger print after a short delay
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
+            
+        } catch(err) {
+            console.error('Error in downloadTicket:', err);
+            alert('Gagal mengunduh e-tiket. Silahkan coba lagi.');
+        }
+    }
+
     // FINALIZE
     function finalizeBooking() {
         // Validate credit card if selected
@@ -6226,28 +6566,69 @@
             }
         }
         
+        // Generate booking number
+        const bookingNumber = "TV-" + Math.floor(Math.random() * 9000000 + 1000000);
+        
+        // Calculate dates and nights
+        const dariDate = new Date(document.getElementById('date-pergi').value);
+        const pulangDate = new Date(document.getElementById('date-pulang').value);
+        const nights = Math.floor((pulangDate - dariDate) / (1000 * 60 * 60 * 24));
+        
+        // Generate seat numbers based on passenger count
+        const totalPax = currentPax.adult + currentPax.child + currentPax.infant;
+        const seats = [];
+        for (let i = 0; i < totalPax; i++) {
+            const row = String.fromCharCode(65 + i);
+            seats.push(row + "1");
+        }
+        
+        // Calculate prices for each service
+        let airlinePrice = selectedBundle.price_breakdown?.flight_price || Math.round(selectedBundle.original_price * 0.35);
+        let hotelPrice = selectedBundle.price_breakdown?.hotel_price || Math.round(selectedBundle.original_price * 0.40);
+        let activityPrice = selectedBundle.price_breakdown?.activity_price || Math.round(selectedBundle.original_price * 0.25);
+        
+        // Apply discount
+        airlinePrice = Math.round(airlinePrice * (1 - selectedBundle.discount_percentage/100));
+        hotelPrice = Math.round(hotelPrice * (1 - selectedBundle.discount_percentage/100));
+        activityPrice = Math.round(activityPrice * (1 - selectedBundle.discount_percentage/100));
+        
+        const totalPrice = selectedBundle.price * totalPax;
+        
+        // Get payment method name
+        const paymentMethodName = m.title;
+        const paymentDate = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+        
+        // Populate SMART BUNDLE section
+        document.getElementById('tick-booking-number').innerText = bookingNumber;
         document.getElementById('tick-route').innerText = `${document.getElementById('in-dari').value} → ${document.getElementById('in-ke').value}`;
         document.getElementById('tick-dates').innerText = `${document.getElementById('date-pergi').value} - ${document.getElementById('date-pulang').value}`;
         document.getElementById('tick-pax').innerText = document.getElementById('display-pax').value;
+        document.getElementById('tick-total-price').innerText = `Rp ${totalPrice.toLocaleString('id-ID')}`;
         
-        document.getElementById('tick-services').innerHTML = `
-            <div style="display:flex; gap:10px; margin-bottom:12px;">
-                <i class="fa-solid fa-plane" style="color:var(--tv-blue)"></i>
-                <div><b>${selectedBundle.airline}</b><br><span style="font-size:12px;">${selectedBundle.flight_type}</span></div>
-            </div>
-            <div style="display:flex; gap:10px; margin-bottom:12px;">
-                <i class="fa-solid fa-hotel" style="color:var(--tv-blue)"></i>
-                <div><b>${selectedBundle.hotel}</b><br><span style="font-size:12px;">Pilihan Kamar Terbaik</span></div>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <i class="fa-solid fa-ticket" style="color:var(--tv-blue)"></i>
-                <div><b>${selectedBundle.activity}</b><br><span style="font-size:12px;">Tiket Terusan</span></div>
-            </div>
-        `;
+        // Populate FLIGHT TICKET
+        document.getElementById('tick-airline-name').innerText = selectedBundle.airline;
+        document.getElementById('tick-flight-type').innerText = selectedBundle.flight_type || "Direct Flight";
+        document.getElementById('tick-seat-number').innerText = seats.join(", ");
+        document.getElementById('tick-flight-price').innerText = `Rp ${airlinePrice.toLocaleString('id-ID')}`;
+        
+        // Populate HOTEL TICKET
+        document.getElementById('tick-hotel-name').innerText = selectedBundle.hotel;
+        document.getElementById('tick-room-type').innerText = selectedBundle.room_type || "Deluxe Room";
+        document.getElementById('tick-nights').innerText = nights > 0 ? `${nights} Malam` : "1 Malam";
+        document.getElementById('tick-hotel-price').innerText = `Rp ${hotelPrice.toLocaleString('id-ID')}`;
+        
+        // Populate ACTIVITY TICKET
+        document.getElementById('tick-activity-name').innerText = selectedBundle.activity;
+        document.getElementById('tick-activity-type').innerText = "Guided Tour & Experience";
+        document.getElementById('tick-activity-pax').innerText = `${totalPax} Orang`;
+        document.getElementById('tick-activity-price').innerText = `Rp ${activityPrice.toLocaleString('id-ID')}`;
+        
+        // Populate INVOICE / PAYMENT PROOF
+        document.getElementById('tick-payment-method').innerText = paymentMethodName;
+        document.getElementById('tick-payment-date').innerText = paymentDate;
+        document.getElementById('tick-invoice-total').innerText = `Rp ${totalPrice.toLocaleString('id-ID')}`;
         
         // Add notification with booking details
-        const totalPax = currentPax.adult + currentPax.child + currentPax.infant;
-        const totalPrice = selectedBundle.price * totalPax;
         addNotification({
             dari: document.getElementById('in-dari').value,
             ke: document.getElementById('in-ke').value,
