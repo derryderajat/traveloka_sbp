@@ -1,435 +1,662 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Budget Planning POC - Traveloka Style (Revised)</title>
+    <title>Smart Budget Planning - Traveloka POC</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --tv-blue: #0194f3;
-            --tv-dark-blue: #0178c1;
+            --tv-dark: #0178c1;
             --tv-orange: #ff5e1f;
             --tv-bg: #f2f3f3;
             --tv-text: #434343;
-            --tv-light-text: #687176;
+            --tv-light: #687176;
             --white: #ffffff;
             --border: #e6eaed;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #cbd5e0; display: flex; justify-content: center; min-height: 100vh; padding: 20px 0; }
-
-        /* Container mirip Frame HP */
-        #phone-emulator {
-            width: 414px;
-            height: 850px;
-            background: var(--white);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border-radius: 30px;
-            border: 8px solid #333;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        body { 
+            background-color: #f0f2f5; 
+            color: var(--tv-text);
+            line-height: 1.4;
         }
 
-        .screen { display: none; height: 100%; width: 100%; overflow-y: auto; background: var(--tv-bg); padding-bottom: 80px; }
-        .screen.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        /* 1. RESPONSIVE CONTAINER */
+        .app-wrapper {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--tv-bg);
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .screen { 
+            display: none; 
+            min-height: 100vh;
+            padding-bottom: 80px; 
+        }
+        .screen.active { display: block; }
 
-        /* Header Gaya Traveloka */
-        .tv-header { background: var(--tv-blue); color: var(--white); padding: 50px 20px 15px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 15px; }
-        .tv-header i { cursor: pointer; font-size: 20px; }
-        .tv-header h2 { font-size: 18px; font-weight: 600; }
-
-        /* Home Screen */
-        .home-top { background: var(--tv-blue); height: 180px; padding: 20px; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; }
-        .search-container { background: var(--white); border-radius: 12px; margin: -100px 15px 20px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .grid-menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 10px; }
-        .menu-item { text-align: center; font-size: 11px; font-weight: 600; color: var(--tv-text); }
-        .menu-icon { width: 45px; height: 45px; border-radius: 50%; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; color: white; }
-
-        /* Banner Spesial */
-        .smart-banner { margin: 20px 15px; border-radius: 12px; background: linear-gradient(135deg, #0194f3 0%, #015fa0 100%); padding: 20px; color: white; position: relative; cursor: pointer; overflow: hidden; }
-        .smart-banner::after { content: '\f0d0'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; right: -10px; bottom: -10px; font-size: 80px; opacity: 0.15; }
-        .smart-banner h3 { font-size: 20px; margin-bottom: 5px; }
-        .smart-banner p { font-size: 13px; opacity: 0.9; }
-
-        /* Form Styling */
-        .form-card { background: white; margin: 15px; padding: 20px; border-radius: 12px; }
-        .input-box { margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-        .input-box label { display: block; font-size: 12px; color: var(--tv-light-text); font-weight: 600; }
-        .input-box div { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
-        .input-box input { border: none; outline: none; font-size: 15px; width: 100%; font-weight: 500; }
-
-        /* Recommendation Cards */
-        .rec-card { background: white; margin: 15px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .rec-img { height: 150px; background-size: cover; background-position: center; position: relative; background-color: #ddd; }
-        .rec-badge { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; }
-        .rec-body { padding: 15px; }
-        .rec-title { font-weight: 700; font-size: 16px; margin-bottom: 5px; }
-        .rec-price { color: var(--tv-orange); font-weight: 700; font-size: 18px; }
-
-        /* Detail Screen Review */
-        .review-header { display: flex; gap: 10px; padding: 15px; background: white; margin-bottom: 10px; }
-        .review-thumb { width: 80px; height: 80px; border-radius: 8px; background-size: cover; background-position: center; background-color: #ddd; }
-        .review-info { flex: 1; }
-
-        /* Button */
-        .tv-btn { background: var(--tv-orange); color: white; border: none; width: 100%; padding: 15px; border-radius: 8px; font-weight: 700; font-size: 16px; cursor: pointer; }
-        .tv-btn-blue { background: var(--tv-blue); color: white; border: none; width: 100%; padding: 15px; border-radius: 8px; font-weight: 700; font-size: 16px; cursor: pointer; }
-
-        /* Checkout */
-        .checkout-section { background: white; padding: 15px; margin-bottom: 10px; }
-        .checkout-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
-
-        /* Bottom Nav */
-        .bottom-nav { position: absolute; bottom: 0; width: 100%; background: white; border-top: 1px solid var(--border); display: flex; padding: 10px 0; z-index: 200; }
-        .nav-tab { flex: 1; text-align: center; color: var(--tv-light-text); font-size: 10px; cursor: pointer; }
-        .nav-tab.active { color: var(--tv-blue); }
-        .nav-tab i { font-size: 20px; display: block; margin-bottom: 3px; }
-
-        /* E-Ticket Styles */
-        .ticket-container { margin: 20px; background: white; border-radius: 15px; overflow: hidden; border: 1px solid #ddd; }
-        .ticket-top { background: var(--tv-dark-blue); color: white; padding: 20px; text-align: center; }
-        .ticket-body { padding: 20px; }
-        .ticket-row { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px dashed #ddd; padding-bottom: 10px; }
-        .dashed-line { border-top: 2px dashed var(--tv-bg); margin: 15px 0; }
+        /* 2. SHARED COMPONENTS */
+        .tv-header { 
+            background: var(--tv-blue); 
+            color: white; 
+            padding: 20px 15px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
         
-        /* VA Screen Styles */
-        .va-card { background: white; margin: 15px; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .va-timer { background: #fff3e0; color: #e65100; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 14px; margin-bottom: 15px; display: inline-block; }
-        .va-number { font-size: 26px; font-weight: bold; color: var(--tv-blue); letter-spacing: 2px; margin: 15px 0; }
-        .va-copy { color: var(--tv-blue); font-size: 14px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
-        .va-total { font-size: 22px; font-weight: bold; color: var(--tv-orange); margin-top: 5px; }
-        .instruction-box { background: white; margin: 15px; border-radius: 12px; padding: 15px; }
-        .instruction-item { padding: 15px 0; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-        .instruction-item:last-child { border-bottom: none; }
+        .card { background: white; margin: 12px; padding: 15px; border-radius: 8px; }
+        .input-group { margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 8px; position: relative; }
+        .input-group label { display: block; font-size: 11px; color: var(--tv-light); font-weight: 600; text-transform: uppercase; }
+        .input-group div { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+        .input-group input { border: none; outline: none; font-size: 15px; width: 100%; font-weight: 500; background: transparent; }
+
+        .btn-orange { background: var(--tv-orange); color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; text-align: center; }
+        .btn-outline { border: 1px solid var(--tv-blue); color: var(--tv-blue); background: transparent; padding: 8px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+        /* 3. MODALS */
+        .modal-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: flex-end; 
+        }
+        .modal-content { 
+            background: white; width: 100%; max-width: 480px; border-radius: 20px 20px 0 0; 
+            padding: 20px; animation: slideUp 0.3s ease-out; max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .counter-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border); }
+        .counter-controls { display: flex; align-items: center; gap: 15px; }
+        .counter-btn { width: 32px; height: 32px; border: 1px solid var(--tv-blue); color: var(--tv-blue); border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: white; font-weight: bold; }
+        .counter-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: #ccc; color: #ccc; }
+
+        /* 4. AUTOCOMPLETE DROPDOWN */
+        .autocomplete-list {
+            position: absolute; top: 100%; left: 0; right: 0; background: white;
+            z-index: 200; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 0 0 8px 8px;
+            display: none; max-height: 200px; overflow-y: auto;
+        }
+        .autocomplete-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 14px; }
+        .autocomplete-item:hover { background: #f9f9f9; }
+
+        /* 5. PAYMENT */
+        .payment-option { border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+        .payment-option.active { border-color: var(--tv-blue); background: rgba(1,148,243,0.05); }
+
+        /* 6. VA / GUIDE SCREEN */
+        .va-box { background: white; text-align: center; padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin: 15px; }
+        .va-number { font-size: 24px; font-weight: bold; color: var(--tv-blue); letter-spacing: 1.5px; margin: 10px 0; }
+        .guide-steps { list-style: decimal; margin-left: 20px; font-size: 14px; color: var(--tv-text); }
+        .guide-steps li { margin-bottom: 10px; }
+
+        /* 7. E-TICKET */
+        .ticket-box { margin: 15px; background: white; border-radius: 12px; border: 1px solid #ddd; overflow: hidden; }
+        .ticket-head { background: var(--tv-dark); color: white; padding: 15px; text-align: center; }
+        .ticket-body { padding: 20px; position: relative; }
+        .ticket-dash { border-top: 1px dashed #ddd; margin: 15px 0; }
     </style>
 </head>
 <body>
 
-<div id="phone-emulator">
+<div class="app-wrapper">
     
-    <!-- 1. HOME SCREEN -->
+    <!-- SCREEN 1: HOME -->
     <div id="scr-home" class="screen active">
-        <div class="home-top">
-            <div style="display:flex; justify-content:space-between; color:white; align-items:center;">
-                <div style="font-size:22px; font-weight:bold;">traveloka</div>
-                <div style="display:flex; gap:15px; font-size:18px;">
-                    <i class="fa-solid fa-percent"></i>
-                    <i class="fa-regular fa-bell"></i>
-                </div>
-            </div>
+        <div style="background: var(--tv-blue); padding: 50px 20px 20px;">
+            <h2 style="color:white; font-size: 24px;">traveloka</h2>
         </div>
-        
-        <div class="search-container">
-            <div class="grid-menu">
-                <div class="menu-item"><div class="menu-icon" style="background:#0194f3"><i class="fa-solid fa-plane"></i></div>Tiket Pesawat</div>
-                <div class="menu-item"><div class="menu-icon" style="background:#235d9f"><i class="fa-solid fa-hotel"></i></div>Hotel</div>
-                <div class="menu-item"><div class="menu-icon" style="background:#42b549"><i class="fa-solid fa-train"></i></div>Tiket Kereta</div>
-                <div class="menu-item"><div class="menu-icon" style="background:#f5a623"><i class="fa-solid fa-bus"></i></div>Bus & Travel</div>
-                <div class="menu-item"><div class="menu-icon" style="background:#ff5e1f"><i class="fa-solid fa-utensils"></i></div>Kuliner</div>
-                <div class="menu-item"><div class="menu-icon" style="background:#00d1ce"><i class="fa-solid fa-ticket"></i></div>Xperience</div>
-                <div class="menu-item"><div class="menu-icon" style="background:#9b59b6"><i class="fa-solid fa-car"></i></div>Rental Mobil</div>
-                <div class="menu-item"><div class="menu-icon" style="background:#687176"><i class="fa-solid fa-ellipsis"></i></div>Lainnya</div>
-            </div>
+        <div class="card" onclick="showScreen('scr-form')" style="background: linear-gradient(135deg, #0194f3, #015fa0); color: white; cursor: pointer; margin-top: -30px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <h3 style="margin-bottom:5px;">Smart Budget Planning</h3>
+            <p style="font-size: 13px; opacity: 0.9;">Liburan impian, budget aman. Coba sekarang!</p>
+            <i class="fa-solid fa-magic-wand-sparkles" style="position: absolute; right: 20px; top: 20px; font-size: 40px; opacity: 0.3;"></i>
         </div>
-
-        <div class="smart-banner" onclick="showScreen('scr-form')">
-            <h3>Smart Budget Planning</h3>
-            <p>Rencanakan liburan impian sesuai budget Anda secara otomatis. Coba Sekarang!</p>
-            <div style="margin-top:10px; background:rgba(255,255,255,0.2); display:inline-block; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:bold;">Mulai Perencanaan <i class="fa-solid fa-arrow-right"></i></div>
-        </div>
-
-        <div style="padding:0 15px;">
-            <h4 style="margin-bottom:10px;">Promo Terpopuler</h4>
-            <div style="width:100%; height:150px; border-radius:12px; background:url('https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=400&q=80'); background-size:cover;"></div>
-        </div>
-
-        <div class="bottom-nav">
-            <div class="nav-tab active"><i class="fa-solid fa-house"></i>Awal</div>
-            <div class="nav-tab"><i class="fa-solid fa-compass"></i>Simpan</div>
-            <div class="nav-tab"><i class="fa-solid fa-list-ul"></i>Pesanan</div>
-            <div class="nav-tab"><i class="fa-solid fa-user"></i>Akun</div>
-        </div>
+        <div style="padding: 20px; font-weight: bold;">Inspirasi Destinasi</div>
+        <div class="card" style="height: 150px; background: url('https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=400&q=80') center/cover; border-radius: 12px;"></div>
     </div>
 
-    <!-- 2. FORM INPUT SCREEN -->
+    <!-- SCREEN 2: FORM -->
     <div id="scr-form" class="screen">
         <div class="tv-header">
             <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-home')"></i>
             <h2>Smart Budget Planning</h2>
         </div>
-        <div class="form-card">
-            <div class="input-box">
+        
+        <div class="card">
+            <div class="input-group">
                 <label>Dari</label>
-                <div><i class="fa-solid fa-plane-departure" style="color:var(--tv-blue)"></i> <input type="text" value="Jakarta (JKTA)"></div>
+                <div>
+                    <i class="fa-solid fa-plane-departure" style="color:var(--tv-blue)"></i>
+                    <input type="text" id="in-dari" placeholder="Cari Kota Asal" autocomplete="off" oninput="handleSearch(this, 'dari')">
+                </div>
+                <div id="list-dari" class="autocomplete-list"></div>
             </div>
-            <div class="input-box">
+            <div class="input-group">
                 <label>Ke</label>
-                <div><i class="fa-solid fa-location-dot" style="color:#e74c3c"></i> <input type="text" value="Bangkok (BKK)"></div>
+                <div>
+                    <i class="fa-solid fa-location-dot" style="color:#e74c3c"></i>
+                    <input type="text" id="in-ke" placeholder="Cari Kota Tujuan" autocomplete="off" oninput="handleSearch(this, 'ke')">
+                </div>
+                <div id="list-ke" class="autocomplete-list"></div>
             </div>
-            <div style="display:flex; gap:15px;">
-                <div class="input-box" style="flex:1">
+
+            <div style="display:flex; gap:12px;">
+                <div class="input-group" style="flex:1">
                     <label>Pergi</label>
-                    <div><i class="fa-regular fa-calendar" style="color:var(--tv-light-text)"></i> <input type="text" value="27 Agt 2026"></div>
+                    <div><input type="date" id="date-pergi"></div>
                 </div>
-                <div class="input-box" style="flex:1">
+                <div class="input-group" style="flex:1">
                     <label>Pulang</label>
-                    <div><i class="fa-regular fa-calendar" style="color:var(--tv-light-text)"></i> <input type="text" value="04 Sep 2026"></div>
+                    <div><input type="date" id="date-pulang"></div>
                 </div>
             </div>
-            <div class="input-box">
+
+            <div class="input-group" onclick="openPaxModal()" style="cursor:pointer">
                 <label>Penumpang</label>
-                <div><i class="fa-solid fa-user-group" style="color:var(--tv-light-text)"></i> <input type="text" value="2 Dewasa"></div>
+                <div>
+                    <i class="fa-solid fa-user-group" style="color:var(--tv-light)"></i>
+                    <input type="text" id="display-pax" readonly value="1 Dewasa">
+                </div>
             </div>
-            <div class="input-box" style="border-bottom:2px solid var(--tv-blue)">
+
+            <div class="input-group">
                 <label>Maksimum Budget Per Orang</label>
-                <div><span style="font-weight:bold; color:var(--tv-blue)">Rp</span> <input type="text" value="10.000.000" style="color:var(--tv-blue); font-size:18px;"></div>
+                <div>
+                    <span style="font-weight:bold; color:var(--tv-blue)">Rp</span>
+                    <input type="text" id="in-budget" placeholder="0" oninput="formatNumber(this)">
+                </div>
             </div>
-            <button class="tv-btn" style="margin-top:20px;" onclick="showScreen('scr-results')">Cari Rekomendasi Destinasi</button>
+
+            <button class="btn-orange" style="margin-top: 10px;" onclick="searchBundles()">Cari Rekomendasi</button>
         </div>
     </div>
 
-    <!-- 3. RESULTS SCREEN (FROM - TO) -->
+    <!-- SCREEN 3: RESULTS -->
     <div id="scr-results" class="screen">
         <div class="tv-header">
             <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-form')"></i>
             <div>
-                <h2 style="font-size:14px;">Jakarta → Bangkok</h2>
-                <p style="font-size:11px; opacity:0.8;">27 Agt - 04 Sep | 2 Dewasa</p>
+                <h2 id="res-route" style="font-size:15px;">Jakarta → Bangkok</h2>
+                <p id="res-meta" style="font-size:11px; opacity:0.8;">27 Agt - 04 Sep | 2 Dewasa</p>
             </div>
         </div>
 
-        <div style="padding:15px; font-weight:bold; color:var(--tv-text)">Paket Bundle Terbaik Untuk Anda</div>
-
-        <div class="rec-card" onclick="showScreen('scr-details')">
-            <!-- FIXED IMAGE URL HERE -->
-            <div class="rec-img" style="background-image: url('https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=600&q=80')">
-                <div class="rec-badge"><i class="fa-solid fa-star"></i> Pilihan Cerdas</div>
-            </div>
-            <div class="rec-body">
-                <div class="rec-title">Bangkok Essential Getaway</div>
-                <p style="font-size:12px; color:var(--tv-light-text); margin-bottom:10px;">Citilink + Centre Point Hotel Pratunam + Wat Arun Tour</p>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <div style="font-size:12px; text-decoration:line-through; color:#999;">Rp 21.450.000</div>
-                        <div class="rec-price">Rp 19.228.557</div>
-                    </div>
-                    <div style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:4px; font-size:12px; font-weight:bold;">Hemat 10%</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="rec-card">
-            <!-- FIXED IMAGE URL HERE -->
-            <div class="rec-img" style="background-image: url('https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=600&q=80')"></div>
-            <div class="rec-body">
-                <div class="rec-title">Bangkok Shopping Luxury</div>
-                <p style="font-size:12px; color:var(--tv-light-text); margin-bottom:10px;">Thai Airways + Berkeley Hotel + Siam Paragon Voucher</p>
-                <div class="rec-price">Rp 24.100.000</div>
-            </div>
-        </div>
+        <div style="padding:15px; font-weight:bold;">Paket Bundle Terbaik Untuk Anda</div>
+        <div id="results-list"></div>
     </div>
 
-    <!-- 4. FILL IN DETAILS SCREEN -->
-    <div id="scr-details" class="screen">
+    <!-- SCREEN 4: BOOKING -->
+    <div id="scr-booking" class="screen">
         <div class="tv-header">
             <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-results')"></i>
             <h2>Isi Data Pemesanan</h2>
         </div>
-
-        <div style="background:white; padding:15px; margin-bottom:10px;">
-            <div style="font-weight:bold; margin-bottom:15px;">Item Terpilih</div>
-            <div class="review-header" style="border: 1px solid var(--border); border-radius:8px;">
-                <!-- FIXED IMAGE URL HERE -->
-                <div class="review-thumb" style="background-image: url('https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?auto=format&fit=crop&w=200&q=80')"></div>
-                <div class="review-info">
-                    <div style="font-size:11px; color:var(--tv-blue); font-weight:bold;">PESAWAT</div>
-                    <div style="font-weight:bold; font-size:13px;">Citilink (Pulang Pergi)</div>
-                    <div style="font-size:12px; color:var(--tv-light-text);">JKT - BKK</div>
-                </div>
-            </div>
-            <div class="review-header" style="border: 1px solid var(--border); border-radius:8px;">
-                <div class="review-thumb" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=200&q=80')"></div>
-                <div class="review-info">
-                    <div style="font-size:11px; color:var(--tv-blue); font-weight:bold;">HOTEL</div>
-                    <div style="font-weight:bold; font-size:13px;">Centre Point Plus Pratunam</div>
-                    <div style="font-size:12px; color:var(--tv-light-text);">8 Malam | Deluxe Room</div>
-                </div>
-            </div>
-            <div class="review-header" style="border: 1px solid var(--border); border-radius:8px;">
-                <div class="review-thumb" style="background-image: url('https://images.unsplash.com/photo-1528154291023-a6525fabe5b4?auto=format&fit=crop&w=200&q=80')"></div>
-                <div class="review-info">
-                    <div style="font-size:11px; color:var(--tv-blue); font-weight:bold;">AKTIVITAS</div>
-                    <div style="font-weight:bold; font-size:13px;">Wat Arun & Chao Phraya Tour</div>
-                    <div style="font-size:12px; color:var(--tv-light-text);">Tur Pemandu | Tiket Masuk</div>
-                </div>
-            </div>
+        
+        <div class="card" id="booking-pax-list">
+            <!-- Dynamic Content -->
         </div>
 
-        <div class="checkout-section">
-            <div style="font-weight:bold; margin-bottom:15px;"><i class="fa-solid fa-address-book" style="color:var(--tv-blue)"></i> Data Kontak</div>
-            <div class="input-box">
-                <label>Nama Lengkap</label>
-                <input type="text" value="Derry Derajat">
-            </div>
-            <div class="input-box">
-                <label>Email</label>
-                <input type="text" value="derry.d@email.com">
-            </div>
+        <div style="padding:15px;">
+            <button class="btn-orange" onclick="showScreen('scr-payment')">Lanjut ke Pembayaran</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 5: PAYMENT -->
+    <div id="scr-payment" class="screen">
+        <div class="tv-header">
+            <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-booking')"></i>
+            <h2>Metode Pembayaran</h2>
         </div>
 
-        <div class="checkout-section">
-            <div style="font-weight:bold; margin-bottom:15px;"><i class="fa-solid fa-user-check" style="color:var(--tv-blue)"></i> Data Penumpang</div>
-            <div style="padding:10px; border:1px solid var(--border); border-radius:8px; margin-bottom:10px;">
-                <div style="font-size:13px; font-weight:bold;">Penumpang 1: Tuan Derry Derajat</div>
-            </div>
-            <div style="padding:10px; border:1px solid var(--border); border-radius:8px;">
-                <div style="font-size:13px; font-weight:bold;">Penumpang 2: Nyonya Shinta Amalia</div>
+        <div class="card">
+            <div style="font-weight:bold; margin-bottom:15px;">Pilih Metode Pembayaran</div>
+            <div id="payment-methods-list">
+                <!-- Dynamic Content -->
             </div>
         </div>
 
         <div style="padding:15px;">
-            <button class="tv-btn" onclick="showScreen('scr-payment')">Lanjut ke Pembayaran</button>
+            <button class="btn-orange" onclick="processPayment()">Bayar Sekarang</button>
         </div>
     </div>
 
-    <!-- 5. PAYMENT SCREEN -->
-    <div id="scr-payment" class="screen">
+    <!-- SCREEN 6: GUIDE / VA -->
+    <div id="scr-guide" class="screen">
         <div class="tv-header">
-            <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-details')"></i>
-            <h2>Rincian Pembayaran</h2>
-        </div>
-
-        <div class="checkout-section">
-            <div style="font-weight:bold; margin-bottom:15px;">Rincian Harga</div>
-            <div class="checkout-row"><span>Paket Bangkok Essential (2 Org)</span> <span>Rp 21.450.000</span></div>
-            <div class="checkout-row" style="color:#2e7d32; font-weight:bold;"><span>Diskon Smart Bundle (10%)</span> <span>-Rp 2.221.443</span></div>
-            <div class="checkout-row"><span>Biaya Layanan</span> <span>Gratis</span></div>
-            <div class="dashed-line"></div>
-            <div class="checkout-row" style="font-size:18px; font-weight:bold;"><span>Total Pembayaran</span> <span style="color:var(--tv-orange)">Rp 19.228.557</span></div>
-        </div>
-
-        <div class="checkout-section">
-            <div style="font-weight:bold; margin-bottom:15px;">Metode Pembayaran</div>
-            <div style="display:flex; align-items:center; gap:15px; padding:12px; border:1px solid var(--tv-blue); border-radius:8px; background:rgba(1, 148, 243, 0.05);">
-                <i class="fa-solid fa-building-columns" style="font-size:24px; color:var(--tv-blue)"></i>
-                <div style="flex:1">
-                    <div style="font-weight:bold; font-size:14px;">BCA Virtual Account</div>
-                    <div style="font-size:12px; color:var(--tv-light-text);">Dicek Otomatis</div>
-                </div>
-                <i class="fa-solid fa-circle-check" style="color:var(--tv-blue)"></i>
-            </div>
-            <div style="margin-top:10px; font-size:12px; color:var(--tv-light-text); text-align:center;">
-                Metode lain: Kartu Kredit, Mandiri VA, OVO, GoPay
-            </div>
-        </div>
-
-        <div style="padding:15px; position:absolute; bottom:0; width:100%; background:white; border-top:1px solid #ddd;">
-            <!-- CHANGED ROUTING HERE TO VA SCREEN -->
-            <button class="tv-btn" onclick="showScreen('scr-va')">BAYAR SEKARANG</button>
-        </div>
-    </div>
-
-    <!-- 5.5. VIRTUAL ACCOUNT INSTRUCTION SCREEN (NEW) -->
-    <div id="scr-va" class="screen">
-        <div class="tv-header">
-            <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-payment')"></i>
-            <h2>Selesaikan Pembayaran</h2>
+            <i class="fa-solid fa-xmark" onclick="showScreen('scr-payment')"></i>
+            <h2 id="guide-title">Pembayaran</h2>
         </div>
         
-        <div class="va-card">
-            <div class="va-timer">
-                <i class="fa-regular fa-clock"></i> Selesaikan dalam 01:59:59
-            </div>
-            <div style="font-size:14px; color:var(--tv-light-text);">BCA Virtual Account</div>
-            
-            <div class="va-number">80777 081234567890</div>
-            
-            <div class="va-copy" onclick="alert('Nomor VA berhasil disalin!')">
-                <span>Salin Nomor</span> <i class="fa-regular fa-copy"></i>
-            </div>
-            
-            <div class="dashed-line"></div>
-            
-            <div style="font-size:14px; color:var(--tv-light-text);">Total Pembayaran</div>
-            <div class="va-total">Rp 19.228.557</div>
-            <div class="va-copy" style="margin-top:5px;" onclick="alert('Nominal berhasil disalin!')">
-                <span>Salin Nominal</span> <i class="fa-regular fa-copy"></i>
-            </div>
+        <div id="guide-body">
+            <!-- Dynamic Content -->
         </div>
 
-        <div class="instruction-box">
-            <div style="font-weight:bold; font-size:16px; margin-bottom:10px;">Cara Pembayaran</div>
-            <div class="instruction-item">
-                <span>m-BCA (BCA mobile)</span> <i class="fa-solid fa-chevron-down" style="color:var(--tv-light-text)"></i>
-            </div>
-            <div class="instruction-item">
-                <span>KlikBCA</span> <i class="fa-solid fa-chevron-down" style="color:var(--tv-light-text)"></i>
-            </div>
-            <div class="instruction-item">
-                <span>ATM BCA</span> <i class="fa-solid fa-chevron-down" style="color:var(--tv-light-text)"></i>
-            </div>
-        </div>
-
-        <div style="padding:15px; position:absolute; bottom:0; width:100%; background:white; border-top:1px solid #ddd;">
-            <button class="tv-btn" onclick="showScreen('scr-success')">SAYA SUDAH BAYAR</button>
+        <div style="padding:15px; position:fixed; bottom:0; width:100%; max-width:480px; background:white; border-top:1px solid #ddd;">
+            <button class="btn-orange" onclick="finalizeBooking()">SAYA SUDAH BAYAR</button>
         </div>
     </div>
 
-    <!-- 6. SUCCESS SCREEN -->
-    <div id="scr-success" class="screen">
-        <div style="text-align:center; padding:60px 20px 30px;">
-            <i class="fa-solid fa-circle-check" style="font-size:80px; color:#42b549; margin-bottom:20px;"></i>
-            <h2 style="font-size:24px; margin-bottom:10px;">Pembayaran Berhasil!</h2>
-            <p style="color:var(--tv-light-text); font-size:14px;">E-Tiket dan Voucher Hotel telah dikirim ke email <b>derry.d@email.com</b></p>
+    <!-- SCREEN 7: TICKET -->
+    <div id="scr-ticket" class="screen">
+        <div style="text-align:center; padding:40px 20px 20px;">
+            <i class="fa-solid fa-circle-check" style="font-size:60px; color:#22c55e;"></i>
+            <h2 style="margin-top:15px;">Pesanan Berhasil!</h2>
+            <p style="color:var(--tv-light); font-size:14px;">E-Tiket telah dikirim ke email Anda.</p>
         </div>
 
-        <div class="ticket-container">
-            <div class="ticket-top">
-                <div style="font-size:12px; opacity:0.8;">E-TICKET BUNDLE</div>
-                <div style="font-size:20px; font-weight:bold; margin-top:5px;">#TVX-20260827-01</div>
+        <div class="ticket-box">
+            <div class="ticket-head">
+                <div style="font-size:12px; opacity:0.8;">E-TICKET SMART BUNDLE</div>
+                <div style="font-size:18px; font-weight:bold; margin-top:4px;">#TV-8827100</div>
             </div>
             <div class="ticket-body">
-                <div class="ticket-row">
-                    <div><b>Pesawat</b><br><span style="font-size:12px;">Citilink QG-123</span></div>
-                    <div style="text-align:right;"><b>27 Agt</b><br><span style="font-size:12px;">CGK → BKK</span></div>
-                </div>
-                <div class="ticket-row">
-                    <div><b>Hotel</b><br><span style="font-size:12px;">Centre Point Pratunam</span></div>
-                    <div style="text-align:right;"><b>8 Malam</b><br><span style="font-size:12px;">Check-in: 27 Agt</span></div>
-                </div>
-                <div class="ticket-row" style="border:none;">
-                    <div><b>Penumpang</b><br><span style="font-size:12px;">Derry Derajat +1</span></div>
-                    <div style="text-align:right;"><b>Status</b><br><span style="font-size:12px; color:#2e7d32; font-weight:bold;">TERKONFIRMASI</span></div>
-                </div>
+                <div id="tick-route" style="font-weight:bold; font-size:16px;">Jakarta → Bangkok</div>
+                <div id="tick-dates" style="font-size:13px; color:var(--tv-light);">27 Agt - 04 Sep 2026</div>
+                <div class="ticket-dash"></div>
+                <div id="tick-services"></div>
+                <div class="ticket-dash"></div>
+                <div style="font-size:12px; color:var(--tv-light);">Total Penumpang</div>
+                <div id="tick-pax" style="font-weight:bold;">1 Dewasa</div>
             </div>
         </div>
 
-        <div style="padding:0 20px;">
-            <button class="tv-btn-blue" style="margin-bottom:15px;" onclick="downloadTicket()">
-                <i class="fa-solid fa-download"></i> Unduh E-Tiket (PDF)
-            </button>
-            <button class="tv-btn" style="background:white; color:var(--tv-blue); border:1px solid var(--tv-blue);" onclick="showScreen('scr-home')">
-                Kembali ke Beranda
-            </button>
+        <div style="padding:15px;">
+            <button class="btn-orange" onclick="location.reload()">Selesai & Kembali ke Beranda</button>
+        </div>
+    </div>
+
+    <!-- MODAL: PASSENGERS -->
+    <div id="modal-pax" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-bottom:20px;">Jumlah Penumpang</h3>
+            
+            <div class="counter-row">
+                <div>
+                    <b>Dewasa</b>
+                    <div style="font-size:12px; color:var(--tv-light)">Usia 12+</div>
+                </div>
+                <div class="counter-controls">
+                    <button class="counter-btn" onclick="updatePax('adult', -1)">-</button>
+                    <span id="cnt-adult" style="font-weight:bold; width:20px; text-align:center;">1</span>
+                    <button class="counter-btn" onclick="updatePax('adult', 1)">+</button>
+                </div>
+            </div>
+            <div class="counter-row">
+                <div>
+                    <b>Anak</b>
+                    <div style="font-size:12px; color:var(--tv-light)">Usia 2 - 11</div>
+                </div>
+                <div class="counter-controls">
+                    <button class="counter-btn" onclick="updatePax('child', -1)">-</button>
+                    <span id="cnt-child" style="font-weight:bold; width:20px; text-align:center;">0</span>
+                    <button class="counter-btn" onclick="updatePax('child', 1)">+</button>
+                </div>
+            </div>
+            <div class="counter-row">
+                <div>
+                    <b>Bayi</b>
+                    <div style="font-size:12px; color:var(--tv-light)">Usia < 2</div>
+                </div>
+                <div class="counter-controls">
+                    <button class="counter-btn" onclick="updatePax('infant', -1)">-</button>
+                    <span id="cnt-infant" style="font-weight:bold; width:20px; text-align:center;">0</span>
+                    <button class="counter-btn" onclick="updatePax('infant', 1)">+</button>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-outline" style="flex:1" onclick="closePaxModal()">Batal</button>
+                <button class="btn-orange" style="flex:1" onclick="applyPax()">Pilih</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PAX DETAILS -->
+    <div id="modal-pax-detail" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="pax-detail-title" style="margin-bottom:20px;">Lengkapi Data Penumpang</h3>
+            <div class="input-group">
+                <label>Nama Lengkap</label>
+                <div><input type="text" id="det-nama" placeholder="Sesuai KTP/Passport"></div>
+            </div>
+            <div class="input-group">
+                <label>Jenis Kelamin</label>
+                <div>
+                    <select id="det-gender" style="border:none; outline:none; font-size:15px; width:100%; font-weight:500; background:transparent;">
+                        <option value="L">Laki-laki</option>
+                        <option value="P">Perempuan</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Tanggal Lahir</label>
+                <div><input type="date" id="det-dob"></div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-outline" style="flex:1" onclick="closeDetailModal()">Tutup</button>
+                <button class="btn-orange" style="flex:1" onclick="saveDetail()">Simpan</button>
+            </div>
         </div>
     </div>
 
 </div>
 
 <script>
-    function showScreen(screenId) {
+    // DATA MOCKS (From journey.json & guide_payment.json)
+    const journeyData = {
+        locations: [
+            { name: "Jakarta", code: "JKTA" },
+            { name: "Bangkok", code: "BKK" },
+            { name: "Singapore", code: "SIN" },
+            { name: "Bali", code: "DPS" },
+            { name: "Tokyo", code: "HND" },
+            { name: "Seoul", code: "ICN" }
+        ],
+        bundles: [
+            { 
+                id: "B-001", route: "JKTA-BKK", name: "Bangkok Essential", 
+                airline: "Citilink", flight: "Ekonomi - Langsung", hotel: "Centre Point Pratunam", 
+                activity: "Wat Arun & Chao Phraya Tour", price: 9200000, 
+                img: "https://images.unsplash.com/photo-1583491470866-bb50c441c9ee?auto=format&fit=crop&w=400&q=80"
+            },
+            { 
+                id: "B-002", route: "JKTA-DPS", name: "Bali Sunset Paradise", 
+                airline: "Garuda", flight: "Ekonomi - Langsung", hotel: "The Apurva Kempinski", 
+                activity: "Kecak Dance Uluwatu", price: 8500000, 
+                img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=400&q=80"
+            }
+        ]
+    };
+
+    const paymentData = {
+        "BCA_VA": {
+            title: "BCA Virtual Account", type: "VA", number: "80777 081234567890",
+            steps: ["Login m-BCA.", "Pilih m-Transfer > BCA Virtual Account.", "Masukkan nomor VA.", "Konfirmasi & Bayar."]
+        },
+        "OVO": {
+            title: "OVO", type: "EW", number: "0812-3456-7890",
+            steps: ["Buka aplikasi OVO.", "Cek notifikasi tagihan.", "Klik Bayar.", "Masukkan PIN OVO."]
+        },
+        "CC": {
+            title: "Kartu Kredit", type: "CC",
+            steps: ["Masukkan nomor kartu.", "Masukkan CVV & Masa Berlaku.", "Klik Bayar.", "Masukkan kode OTP."]
+        }
+    };
+
+    // STATE
+    let currentPax = { adult: 1, child: 0, infant: 0 };
+    let tempPax = { adult: 1, child: 0, infant: 0 };
+    let selectedRoute = { from: "", to: "" };
+    let selectedBundle = null;
+    let selectedPayment = "BCA_VA";
+
+    // UTILS
+    function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-        document.getElementById('phone-emulator').scrollTop = 0;
+        document.getElementById(id).classList.add('active');
+        window.scrollTo(0,0);
     }
 
-    function downloadTicket() {
-        alert("Sedang mengunduh E-Tiket...\n\nDetail:\n- Tiket Pesawat Citilink (JKT-BKK)\n- Voucher Hotel Centre Point\n- Voucher Aktivitas Wat Arun\n\nFile: E-Ticket_Derry_Bangkok.pdf");
+    function formatNumber(input) {
+        let val = input.value.replace(/\D/g, "");
+        input.value = val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
+
+    // DATE INIT
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('date-pergi').value = todayStr;
+    document.getElementById('date-pergi').min = todayStr;
+    document.getElementById('date-pulang').value = todayStr;
+
+    // AUTOCOMPLETE
+    function handleSearch(input, type) {
+        const query = input.value.toLowerCase();
+        const listEl = document.getElementById(`list-${type}`);
+        listEl.innerHTML = "";
+        if (!query) { listEl.style.display = "none"; return; }
+
+        const matches = journeyData.locations.filter(l => l.name.toLowerCase().includes(query) || l.code.toLowerCase().includes(query));
+        if (matches.length > 0) {
+            matches.forEach(m => {
+                const item = document.createElement('div');
+                item.className = "autocomplete-item";
+                item.innerHTML = `<b>${m.name}</b> (${m.code})`;
+                item.onclick = () => {
+                    input.value = m.name;
+                    selectedRoute[type] = m.code;
+                    listEl.style.display = "none";
+                };
+                listEl.appendChild(item);
+            });
+            listEl.style.display = "block";
+        } else {
+            listEl.style.display = "none";
+        }
+    }
+
+    // PASSENGER MODAL
+    function openPaxModal() {
+        tempPax = { ...currentPax };
+        updatePaxUI();
+        document.getElementById('modal-pax').style.display = 'flex';
+    }
+    function closePaxModal() { document.getElementById('modal-pax').style.display = 'none'; }
+    function updatePax(type, delta) {
+        let n = tempPax[type] + delta;
+        if (type === 'adult' && n < 1) return;
+        if (n < 0) return;
+        tempPax[type] = n;
+        updatePaxUI();
+    }
+    function updatePaxUI() {
+        document.getElementById('cnt-adult').innerText = tempPax.adult;
+        document.getElementById('cnt-child').innerText = tempPax.child;
+        document.getElementById('cnt-infant').innerText = tempPax.infant;
+    }
+    function applyPax() {
+        currentPax = { ...tempPax };
+        let arr = [];
+        if (currentPax.adult > 0) arr.push(`${currentPax.adult} Dewasa`);
+        if (currentPax.child > 0) arr.push(`${currentPax.child} Anak`);
+        if (currentPax.infant > 0) arr.push(`${currentPax.infant} Bayi`);
+        document.getElementById('display-pax').value = arr.join(', ');
+        closePaxModal();
+    }
+
+    // SEARCH RESULTS
+    function searchBundles() {
+        const routeKey = `${selectedRoute.dari}-${selectedRoute.ke}`;
+        const matches = journeyData.bundles.filter(b => b.route === routeKey);
+        
+        document.getElementById('res-route').innerText = `${document.getElementById('in-dari').value} → ${document.getElementById('in-ke').value}`;
+        document.getElementById('res-meta').innerText = `${document.getElementById('date-pergi').value} | ${document.getElementById('display-pax').value}`;
+        
+        const listEl = document.getElementById('results-list');
+        listEl.innerHTML = "";
+        
+        if (matches.length === 0) {
+            listEl.innerHTML = `<div class="card" style="text-align:center; color:var(--tv-light);">Maaf, paket tidak ditemukan untuk rute ini.</div>`;
+        } else {
+            matches.forEach(b => {
+                const card = document.createElement('div');
+                card.className = "card";
+                card.style = "padding:0; overflow:hidden; border:1px solid #ddd; cursor:pointer;";
+                card.innerHTML = `
+                    <div style="height:140px; background:url('${b.img}') center/cover"></div>
+                    <div style="padding:15px;">
+                        <div style="color:var(--tv-orange); font-weight:bold; font-size:12px;">Pilihan Cerdas</div>
+                        <div style="font-weight:700; font-size:16px;">${b.name}</div>
+                        <div style="font-size:12px; color:var(--tv-light); margin-top:4px;">${b.airline} + ${b.hotel} + ${b.activity}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:12px;">
+                            <div style="color:var(--tv-orange); font-weight:700; font-size:18px;">Rp ${b.price.toLocaleString('id-ID')}</div>
+                            <div style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold;">Bundle Hemat</div>
+                        </div>
+                    </div>
+                `;
+                card.onclick = () => selectBundle(b);
+                listEl.appendChild(card);
+            });
+        }
+        showScreen('scr-results');
+    }
+
+    function selectBundle(b) {
+        selectedBundle = b;
+        renderBookingForm();
+        showScreen('scr-booking');
+    }
+
+    // BOOKING FORM
+    function renderBookingForm() {
+        const listEl = document.getElementById('booking-pax-list');
+        listEl.innerHTML = `<h3 style="margin-bottom:15px;">Informasi Penumpang</h3>`;
+        
+        const types = [
+            { label: 'Dewasa', count: currentPax.adult, icon: 'fa-user' },
+            { label: 'Anak', count: currentPax.child, icon: 'fa-child' },
+            { label: 'Bayi', count: currentPax.infant, icon: 'fa-baby' }
+        ];
+
+        types.forEach(t => {
+            for(let i=1; i<=t.count; i++) {
+                const item = document.createElement('div');
+                item.className = "input-group";
+                item.style = "border:1px solid var(--border); padding:12px; border-radius:8px; margin-bottom:12px;";
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <i class="fa-solid ${t.icon}" style="color:var(--tv-blue)"></i>
+                            <b>${t.label} ${i} <span style="color:#e74c3c">*</span></b>
+                        </div>
+                        <i class="fa-solid fa-pen-to-square" style="color:var(--tv-blue); cursor:pointer" onclick="openDetailModal('${t.label}', ${i})"></i>
+                    </div>
+                    <div style="font-size:12px; color:var(--tv-light); margin-top:5px;">Belum diisi</div>
+                `;
+                listEl.appendChild(item);
+            }
+        });
+
+        // Initialize payment screen list
+        const payList = document.getElementById('payment-methods-list');
+        payList.innerHTML = "";
+        Object.keys(paymentData).forEach(k => {
+            const m = paymentData[k];
+            const opt = document.createElement('div');
+            opt.className = `payment-option ${selectedPayment === k ? 'active' : ''}`;
+            opt.innerHTML = `
+                <i class="fa-solid ${k === 'CC' ? 'fa-credit-card' : 'fa-building-columns'}" style="color: ${k === 'OVO' ? '#4c2a86' : 'var(--tv-blue)'}"></i>
+                <div style="flex:1"><b>${m.title}</b></div>
+                ${selectedPayment === k ? '<i class="fa-solid fa-circle-check" style="color:var(--tv-blue)"></i>' : ''}
+            `;
+            opt.onclick = () => {
+                selectedPayment = k;
+                renderBookingForm(); // re-render to update active state
+            };
+            payList.appendChild(opt);
+        });
+    </div>
+
+    // PAX DETAIL MODAL
+    function openDetailModal(type, index) {
+        document.getElementById('pax-detail-title').innerText = `Data ${type} ${index}`;
+        // Set date limits based on type
+        const dobIn = document.getElementById('det-dob');
+        const now = new Date();
+        if (type === 'Dewasa') {
+            dobIn.max = new Date(now.getFullYear() - 12, now.getMonth(), now.getDate()).toISOString().split('T')[0];
+            dobIn.min = "";
+        } else if (type === 'Anak') {
+            dobIn.max = new Date(now.getFullYear() - 2, now.getMonth(), now.getDate()).toISOString().split('T')[0];
+            dobIn.min = new Date(now.getFullYear() - 12, now.getMonth(), now.getDate()).toISOString().split('T')[0];
+        } else {
+            dobIn.max = now.toISOString().split('T')[0];
+            dobIn.min = new Date(now.getFullYear() - 2, now.getMonth(), now.getDate()).toISOString().split('T')[0];
+        }
+        document.getElementById('modal-pax-detail').style.display = 'flex';
+    }
+    function closeDetailModal() { document.getElementById('modal-pax-detail').style.display = 'none'; }
+    function saveDetail() {
+        alert("Data berhasil disimpan!");
+        closeDetailModal();
+    }
+
+    // PAYMENT GUIDE
+    function processPayment() {
+        const m = paymentData[selectedPayment];
+        document.getElementById('guide-title').innerText = m.title;
+        
+        const body = document.getElementById('guide-body');
+        let html = `<div class="card" style="text-align:center;">`;
+        
+        if (m.type === "VA") {
+            html += `
+                <div style="color:var(--tv-light); font-size:14px;">BCA Virtual Account</div>
+                <div class="va-number">${m.number}</div>
+                <div style="color:var(--tv-blue); font-size:12px; font-weight:bold; cursor:pointer;"><i class="fa-regular fa-copy"></i> SALIN NOMOR</div>
+            `;
+        } else if (m.type === "EW") {
+            html += `
+                <div style="color:var(--tv-light); font-size:14px;">Nomor OVO</div>
+                <div class="va-number">${m.number}</div>
+            `;
+        } else {
+            html += `<div style="font-weight:bold; margin:20px 0;">Silakan masukkan detail Kartu Kredit Anda.</div>`;
+        }
+
+        html += `
+            <div class="ticket-dash"></div>
+            <div style="text-align:left;">
+                <b style="font-size:14px;">Cara Pembayaran:</b>
+                <ol class="guide-steps" style="margin-top:10px;">
+                    ${m.steps.map(s => `<li>${s}</li>`).join('')}
+                </ol>
+            </div>
+        </div>`;
+        
+        body.innerHTML = html;
+        showScreen('scr-guide');
+    }
+
+    // FINALIZE
+    function finalizeBooking() {
+        document.getElementById('tick-route').innerText = `${document.getElementById('in-dari').value} → ${document.getElementById('in-ke').value}`;
+        document.getElementById('tick-dates').innerText = `${document.getElementById('date-pergi').value} - ${document.getElementById('date-pulang').value}`;
+        document.getElementById('tick-pax').innerText = document.getElementById('display-pax').value;
+        
+        document.getElementById('tick-services').innerHTML = `
+            <div style="display:flex; gap:10px; margin-bottom:12px;">
+                <i class="fa-solid fa-plane" style="color:var(--tv-blue)"></i>
+                <div><b>${selectedBundle.airline}</b><br><span style="font-size:12px;">${selectedBundle.flight}</span></div>
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom:12px;">
+                <i class="fa-solid fa-hotel" style="color:var(--tv-blue)"></i>
+                <div><b>${selectedBundle.hotel}</b><br><span style="font-size:12px;">Pilihan Kamar Terbaik</span></div>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <i class="fa-solid fa-ticket" style="color:var(--tv-blue)"></i>
+                <div><b>${selectedBundle.activity}</b><br><span style="font-size:12px;">Tiket Terusan</span></div>
+            </div>
+        `;
+        
+        showScreen('scr-ticket');
+    }
+
+    // GLOBAL CLICK TO CLOSE DROPDOWN
+    window.onclick = function(event) {
+        if (!event.target.matches('input')) {
+            document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = "none");
+        }
+    };
 </script>
 
 </body>
