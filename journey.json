@@ -1,0 +1,93 @@
+{
+    "locations": [
+        {
+            "name": "Jakarta",
+            "code": "JKTA",
+            "type": "city",
+            "country": "Indonesia"
+        },
+        {
+            "name": "Bangkok",
+            "code": "BKK",
+            "type": "city",
+            "country": "Thailand"
+        },
+        {
+            "name": "Singapore",
+            "code": "SIN",
+            "type": "city",
+            "country": "Singapore"
+        },
+        {
+            "name": "Bali",
+            "code": "DPS",
+            "type": "island",
+            "country": "Indonesia"
+        },
+        {
+            "name": "Tokyo",
+            "code": "HND",
+            "type": "city",
+            "country": "Japan"
+        },
+        {
+            "name": "Kuala Lumpur",
+            "code": "KUL",
+            "type": "city",
+            "country": "Malaysia"
+        },
+        {
+            "name": "Seoul",
+            "code": "ICN",
+            "type": "city",
+            "country": "South Korea"
+        }
+    ],
+    "bundles": [
+        {
+            "id": "BNDL-BKK-001",
+            "route": "JKTA-BKK",
+            "name": "Bangkok Essential Getaway",
+            "airline": "Citilink",
+            "flight_type": "Ekonomi - Langsung",
+            "hotel": "Centre Point Pratunam",
+            "room_type": "Standard Room",
+            "activity": "Wat Arun & Chao Phraya Tour",
+            "price": 9200000,
+            "original_price": 10450000,
+            "discount_percentage": 13,
+            "img": "https://images.unsplash.com/photo-1583491470866-bb50c441c9ee?auto=format&fit=crop&w=600&q=80",
+            "badge": "Pilihan Cerdas"
+        },
+        {
+            "id": "BNDL-BKK-002",
+            "route": "JKTA-BKK",
+            "name": "Bangkok Shopping Luxury",
+            "airline": "Thai Airways",
+            "flight_type": "Bisnis - Langsung",
+            "hotel": "The Berkeley Hotel Pratunam",
+            "room_type": "Deluxe Room",
+            "activity": "Siam Paragon Shopping Voucher VIP",
+            "price": 15400000,
+            "original_price": 17000000,
+            "discount_percentage": 9,
+            "img": "https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=600&q=80",
+            "badge": "Mewah & Nyaman"
+        },
+        {
+            "id": "BNDL-DPS-001",
+            "route": "JKTA-DPS",
+            "name": "Bali Sunset Paradise",
+            "airline": "Garuda Indonesia",
+            "flight_type": "Ekonomi - Langsung",
+            "hotel": "The Apurva Kempinski Bali",
+            "room_type": "Grand Deluxe Ocean Court",
+            "activity": "Kecak Dance Uluwatu & Jimbaran Seafood",
+            "price": 8500000,
+            "original_price": 9800000,
+            "discount_percentage": 15,
+            "img": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80",
+            "badge": "Paling Diminati"
+        }
+    ]
+}
