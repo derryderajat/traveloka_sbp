@@ -188,6 +188,26 @@
             cursor: pointer;
         }
         
+        /* Notification Bell Badge */
+        .notif-bell-container { position: relative; cursor: pointer; }
+        .notif-badge { 
+            position: absolute; 
+            top: -8px; 
+            right: -8px; 
+            background: var(--tv-orange); 
+            color: white; 
+            border-radius: 50%; 
+            width: 20px; 
+            height: 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 12px; 
+            font-weight: bold;
+            border: 2px solid white;
+        }
+        .notif-badge.hidden { display: none; }
+        
         /* Bottom Nav */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; background: white; border-top: 1px solid var(--border); display: flex; padding: 10px 0; z-index: 200; justify-content: space-around;}
         .nav-tab { text-align: center; color: var(--tv-light); font-size: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;}
@@ -211,7 +231,10 @@
             <div style="font-size:24px; font-weight:bold;">traveloka</div>
             <div style="display:flex; gap:15px; font-size:20px;">
                 <i class="fa-solid fa-percent"></i>
-                <i class="fa-regular fa-bell"></i>
+                <div class="notif-bell-container" onclick="renderNotifications(); showScreen('scr-notifications')">
+                    <i class="fa-regular fa-bell"></i>
+                    <div class="notif-badge hidden" id="notif-badge-count">0</div>
+                </div>
             </div>
         </div>
         
@@ -332,7 +355,7 @@
         </div>
 
         <div style="padding:15px;">
-            <button class="btn-orange" onclick="showScreen('scr-payment')">Lanjut ke Pembayaran</button>
+            <button class="btn-orange" onclick="validatePassengerData()">Lanjut ke Pembayaran</button>
         </div>
     </div>
 
@@ -471,6 +494,28 @@
                 <button class="btn-outline" style="flex:1" onclick="closeDetailModal()">Tutup</button>
                 <button class="btn-orange" style="flex:1" onclick="saveDetail()">Simpan</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL: VALIDATION ERROR -->
+    <div id="modal-validation" class="modal-overlay">
+        <div class="modal-content" style="max-width: 360px; text-align: center;">
+            <i class="fa-solid fa-circle-exclamation" style="font-size:48px; color:#e74c3c; margin-bottom:15px;"></i>
+            <h3 id="validation-title" style="margin-bottom:10px;">Perhatian</h3>
+            <p id="validation-message" style="color:var(--tv-light); margin-bottom:20px; font-size:14px;"></p>
+            <button class="btn-orange" onclick="closeValidationModal()" style="width:100%;">Mengerti</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 8: NOTIFICATIONS -->
+    <div id="scr-notifications" class="screen">
+        <div class="tv-header">
+            <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-home')"></i>
+            <h2>Notifikasi</h2>
+        </div>
+        
+        <div id="notifications-list" style="padding:15px;">
+            <!-- Dynamic Content -->
         </div>
     </div>
 
@@ -5585,9 +5630,10 @@
     // STATE
     let currentPax = { adult: 1, child: 0, infant: 0 };
     let tempPax = { adult: 1, child: 0, infant: 0 };
-    let selectedRoute = { from: "", to: "" };
+    let selectedRoute = { dari: "", ke: "" };
     let selectedBundle = null;
     let selectedPayment = "BCA_VA";
+    let notifications = [];  // Array to store purchase notifications
 
     // UTILS
     function showScreen(id) {
@@ -5599,6 +5645,94 @@
     function formatNumber(input) {
         let val = input.value.replace(/\D/g, "");
         input.value = val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    // VALIDATION MODAL
+    function showValidationModal(title, message) {
+        document.getElementById('validation-title').innerText = title;
+        document.getElementById('validation-message').innerText = message;
+        document.getElementById('modal-validation').style.display = 'flex';
+    }
+    function closeValidationModal() {
+        document.getElementById('modal-validation').style.display = 'none';
+    }
+    
+    // NOTIFICATION FUNCTIONS
+    function addNotification(booking) {
+        const notification = {
+            id: Date.now(),
+            date: new Date().toLocaleString('id-ID'),
+            route: `${booking.dari} → ${booking.ke}`,
+            airline: booking.airline,
+            hotel: booking.hotel,
+            activity: booking.activity,
+            totalPassengers: booking.totalPax,
+            totalPrice: booking.totalPrice,
+            discountPercentage: booking.discountPercentage
+        };
+        notifications.unshift(notification);  // Add to beginning
+        updateNotificationBadge();
+        renderNotifications();
+    }
+    
+    function updateNotificationBadge() {
+        const badge = document.getElementById('notif-badge-count');
+        const count = notifications.length;
+        if (count > 0) {
+            badge.innerText = count;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
+    
+    function renderNotifications() {
+        const listEl = document.getElementById('notifications-list');
+        if (notifications.length === 0) {
+            listEl.innerHTML = `
+                <div style="text-align:center; padding:40px 20px; color:var(--tv-light);">
+                    <i class="fa-regular fa-bell" style="font-size:48px; margin-bottom:15px; opacity:0.5;"></i>
+                    <p>Belum ada riwayat pembelian</p>
+                </div>
+            `;
+            return;
+        }
+        
+        listEl.innerHTML = notifications.map((notif, idx) => `
+            <div class="card" style="margin-bottom:15px; position:relative; overflow:hidden; border-left:4px solid var(--tv-orange);">
+                <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:12px;">
+                    <div>
+                        <div style="font-size:12px; color:var(--tv-light);">Pembelian #${idx + 1}</div>
+                        <div style="font-size:14px; font-weight:bold; color:var(--tv-text);">${notif.route}</div>
+                    </div>
+                    <div style="font-size:12px; color:var(--tv-light);">${notif.date}</div>
+                </div>
+                
+                <div style="background:#f9f9f9; padding:10px; border-radius:6px; margin-bottom:12px;">
+                    <div style="display:flex; gap:8px; margin-bottom:8px;">
+                        <i class="fa-solid fa-plane" style="color:var(--tv-blue); width:16px;"></i>
+                        <span style="font-size:13px;">${notif.airline}</span>
+                    </div>
+                    <div style="display:flex; gap:8px; margin-bottom:8px;">
+                        <i class="fa-solid fa-hotel" style="color:var(--tv-blue); width:16px;"></i>
+                        <span style="font-size:13px;">${notif.hotel}</span>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <i class="fa-solid fa-ticket" style="color:var(--tv-blue); width:16px;"></i>
+                        <span style="font-size:13px;">${notif.activity}</span>
+                    </div>
+                </div>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid #eee;">
+                    <div style="font-size:12px; color:var(--tv-light);">
+                        ${notif.totalPassengers} Penumpang | Diskon ${notif.discountPercentage}%
+                    </div>
+                    <div style="font-size:16px; font-weight:bold; color:var(--tv-orange);">
+                        Rp ${notif.totalPrice.toLocaleString('id-ID')}
+                    </div>
+                </div>
+            </div>
+        `).join('');
     }
 
     // DATE INIT
@@ -5664,8 +5798,25 @@
 
     // SEARCH RESULTS
     function searchBundles() {
+        // Validate dari and ke
+        if (!selectedRoute.dari || !selectedRoute.ke) {
+            showValidationModal("Informasi Tidak Lengkap", "Harap lengkapi informasi keberangkatan dan tujuan Anda sebelum mencari paket.");
+            return;
+        }
+        
+        // Get budget value
+        const budgetStr = document.getElementById('in-budget').value.replace(/\./g, '');
+        const budget = parseInt(budgetStr) || 0;
+        
+        if (budget === 0) {
+            showValidationModal("Budget Tidak Diisi", "Silakan masukkan maksimum budget per orang untuk mencari paket.");
+            return;
+        }
+        
         const routeKey = `${selectedRoute.dari}-${selectedRoute.ke}`;
-        const matches = journeyData.bundles.filter(b => b.route === routeKey).sort((a, b) => a.price - b.price);
+        const matches = journeyData.bundles
+            .filter(b => b.route === routeKey && b.price <= budget)
+            .sort((a, b) => a.price - b.price);
         
         document.getElementById('res-route').innerText = `${document.getElementById('in-dari').value} → ${document.getElementById('in-ke').value}`;
         document.getElementById('res-meta').innerText = `${document.getElementById('date-pergi').value} | ${document.getElementById('display-pax').value}`;
@@ -5674,14 +5825,16 @@
         listEl.innerHTML = "";
         
         if (matches.length === 0) {
-            listEl.innerHTML = `<div class="card" style="text-align:center; color:var(--tv-light);">Maaf, paket tidak ditemukan untuk rute ini.</div>`;
-        } else {
-            matches.forEach(b => {
-                const card = document.createElement('div');
-                card.className = "card";
-                card.style = "padding:0; overflow:hidden; border:1px solid #ddd; cursor:pointer;";
-                const badgeColor = b.badge === "Pilihan Cerdas" ? "var(--tv-orange)" : b.badge === "Mewah & Nyaman" ? "#9b59b6" : b.badge === "Paling Diminati" ? "#e74c3c" : "#2ecc71";
-                card.innerHTML = `
+            showValidationModal("Tidak Ada Paket Tersedia", `Maaf, tidak ada paket yang sesuai dengan budget Rp ${budget.toLocaleString('id-ID')} per orang untuk rute ini. Silakan naikkan budget atau ubah pilihan rute.`);
+            return;
+        }
+        
+        matches.forEach(b => {
+            const card = document.createElement('div');
+            card.className = "card";
+            card.style = "padding:0; overflow:hidden; border:1px solid #ddd; cursor:pointer;";
+            const badgeColor = b.badge === "Pilihan Cerdas" ? "var(--tv-orange)" : b.badge === "Mewah & Nyaman" ? "#9b59b6" : b.badge === "Paling Diminati" ? "#e74c3c" : "#2ecc71";
+            card.innerHTML = `
                     <div style="height:140px; background:url('${b.img}') center/cover; position:relative;">
                         <div style="position:absolute; top:10px; left:10px; background:${badgeColor}; color:white; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:bold;">${b.badge}</div>
                         <div style="position:absolute; top:10px; right:10px; background:#e74c3c; color:white; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold;">-${b.discount_percentage}%</div>
@@ -5709,7 +5862,6 @@
                 card.onclick = () => selectBundle(b);
                 listEl.appendChild(card);
             });
-        }
         showScreen('scr-results');
     }
 
@@ -5722,7 +5874,124 @@
     // BOOKING FORM
     function renderBookingForm() {
         const listEl = document.getElementById('booking-pax-list');
-        listEl.innerHTML = `<h3 style="margin-bottom:15px;">Informasi Penumpang</h3>`;
+        
+        // Calculate total passengers
+        const totalPax = currentPax.adult + currentPax.child + currentPax.infant;
+        const discountAmount = selectedBundle.original_price - selectedBundle.price;
+        const totalPrice = selectedBundle.price * totalPax;
+        const totalOriginalPrice = selectedBundle.original_price * totalPax;
+        
+        // Calculate breakdown harga dari price_breakdown jika ada, atau hitung dari proporsi
+        let airlinePrice, hotelPrice, activityPrice;
+        
+        if (selectedBundle.price_breakdown) {
+            airlinePrice = selectedBundle.price_breakdown.flight_price;
+            hotelPrice = selectedBundle.price_breakdown.hotel_price;
+            activityPrice = selectedBundle.price_breakdown.activity_price;
+        } else {
+            // Fallback: hitung berdasarkan proporsi jika price_breakdown tidak ada
+            airlinePrice = Math.round(selectedBundle.original_price * 0.35);
+            hotelPrice = Math.round(selectedBundle.original_price * 0.40);
+            activityPrice = selectedBundle.original_price - airlinePrice - hotelPrice;
+        }
+        
+        const airlinePriceDiscounted = Math.round(airlinePrice * (1 - selectedBundle.discount_percentage/100));
+        const hotelPriceDiscounted = Math.round(hotelPrice * (1 - selectedBundle.discount_percentage/100));
+        const activityPriceDiscounted = Math.round(activityPrice * (1 - selectedBundle.discount_percentage/100));
+        
+        listEl.innerHTML = `
+            <h3 style="margin-bottom:15px;">Detail Paket</h3>
+            <div style="background:#f0f7ff; padding:15px; border-radius:8px; margin-bottom:20px;">
+                <div style="display:flex; gap:10px; margin-bottom:12px;">
+                    <i class="fa-solid fa-plane" style="color:var(--tv-blue); font-size:18px;"></i>
+                    <div style="flex:1;">
+                        <div style="font-size:12px; color:var(--tv-light);">Maskapai</div>
+                        <div style="font-weight:bold;">${selectedBundle.airline}</div>
+                        <div style="font-size:12px; color:var(--tv-light);">${selectedBundle.flight_type}</div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px; margin-bottom:12px;">
+                    <i class="fa-solid fa-hotel" style="color:var(--tv-blue); font-size:18px;"></i>
+                    <div style="flex:1;">
+                        <div style="font-size:12px; color:var(--tv-light);">Hotel</div>
+                        <div style="font-weight:bold;">${selectedBundle.hotel}</div>
+                        <div style="font-size:12px; color:var(--tv-light);">${selectedBundle.room_type}</div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <i class="fa-solid fa-ticket" style="color:var(--tv-blue); font-size:18px;"></i>
+                    <div style="flex:1;">
+                        <div style="font-size:12px; color:var(--tv-light);">Aktivitas</div>
+                        <div style="font-weight:bold;">${selectedBundle.activity}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 style="margin-bottom:15px;">Rincian Biaya Per Komponen</h3>
+            <div style="background:#fff; padding:15px; border-radius:8px; border:1px solid #ddd; margin-bottom:20px;">
+                <!-- Breakdown per komponen (Original) -->
+                <div style="margin-bottom:15px; padding-bottom:12px; border-bottom:1px solid #eee;">
+                    <div style="font-size:13px; font-weight:bold; margin-bottom:10px; color:#333;">Harga Original (per Orang):</div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span style="font-size:12px; color:var(--tv-light);">Penerbangan (${selectedBundle.airline}):</span>
+                        <span style="font-size:12px; font-weight:bold;">Rp ${airlinePrice.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span style="font-size:12px; color:var(--tv-light);">Hotel (${selectedBundle.hotel}):</span>
+                        <span style="font-size:12px; font-weight:bold;">Rp ${hotelPrice.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="font-size:12px; color:var(--tv-light);">Aktivitas (${selectedBundle.activity}):</span>
+                        <span style="font-size:12px; font-weight:bold;">Rp ${activityPrice.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding-top:8px; border-top:1px solid #eee;">
+                        <span style="font-size:12px; color:var(--tv-light); text-decoration:line-through;">Total Original:</span>
+                        <span style="font-size:12px; font-weight:bold; text-decoration:line-through; color:#999;">Rp ${selectedBundle.original_price.toLocaleString('id-ID')}</span>
+                    </div>
+                </div>
+                
+                <!-- Diskon -->
+                <div style="margin-bottom:15px; padding-bottom:12px; border-bottom:1px solid #eee;">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="font-size:12px; color:var(--tv-light);">Diskon (-${selectedBundle.discount_percentage}%):</span>
+                        <span style="font-size:12px; color:#e74c3c; font-weight:bold;">- Rp ${discountAmount.toLocaleString('id-ID')}</span>
+                    </div>
+                </div>
+                
+                <!-- Breakdown per komponen (Setelah Diskon) -->
+                <div style="margin-bottom:15px; padding-bottom:12px; border-bottom:1px solid #eee;">
+                    <div style="font-size:13px; font-weight:bold; margin-bottom:10px; color:#333;">Harga Setelah Diskon (per Orang):</div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span style="font-size:12px; color:var(--tv-light);">Penerbangan:</span>
+                        <span style="font-size:12px; font-weight:bold;">Rp ${airlinePriceDiscounted.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span style="font-size:12px; color:var(--tv-light);">Hotel:</span>
+                        <span style="font-size:12px; font-weight:bold;">Rp ${hotelPriceDiscounted.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="font-size:12px; color:var(--tv-light);">Aktivitas:</span>
+                        <span style="font-size:12px; font-weight:bold;">Rp ${activityPriceDiscounted.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding-top:8px; border-top:1px solid #eee;">
+                        <span style="font-size:12px; color:var(--tv-light); font-weight:bold;">Harga per Orang:</span>
+                        <span style="font-size:14px; font-weight:bold; color:var(--tv-blue);">Rp ${selectedBundle.price.toLocaleString('id-ID')}</span>
+                    </div>
+                </div>
+                
+                <!-- Total untuk semua penumpang -->
+                <div style="background:linear-gradient(135deg, rgba(1,148,243,0.1) 0%, rgba(255,94,31,0.1) 100%); padding:12px; border-radius:6px; border-left:4px solid var(--tv-orange);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-size:12px; color:var(--tv-light);">Total untuk ${totalPax} Penumpang</div>
+                            <div style="font-size:18px; font-weight:bold; color:var(--tv-orange);">Rp ${totalPrice.toLocaleString('id-ID')}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 style="margin-bottom:15px;">Informasi Penumpang</h3>
+        `;
         
         const types = [
             { label: 'Dewasa', count: currentPax.adult, icon: 'fa-user' },
@@ -5734,7 +6003,14 @@
             for(let i=1; i<=t.count; i++) {
                 const item = document.createElement('div');
                 item.className = "input-group";
+                item.id = `pax-item-${t.label}-${i}`;
                 item.style = "border:1px solid var(--border); padding:12px; border-radius:8px; margin-bottom:12px;";
+                
+                // Check if data already saved
+                const key = `${t.label}_${i}`;
+                const savedData = passengerDetails[key];
+                const statusText = savedData ? `<b>${savedData.nama}</b>` : `<span style="color:var(--tv-light);">Belum diisi</span>`;
+                
                 item.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div style="display:flex; gap:10px; align-items:center;">
@@ -5743,7 +6019,7 @@
                         </div>
                         <i class="fa-solid fa-pen-to-square" style="color:var(--tv-blue); cursor:pointer" onclick="openDetailModal('${t.label}', ${i})"></i>
                     </div>
-                    <div style="font-size:12px; color:var(--tv-light); margin-top:5px;">Belum diisi</div>
+                    <div style="margin-top:5px; font-weight:500;" class="pax-status">${statusText}</div>
                 `;
                 listEl.appendChild(item);
             }
@@ -5769,9 +6045,29 @@
         });
     }
 
+    // Store passenger details
+    let passengerDetails = {};
+    let currentPaxType = '';
+    let currentPaxIndex = 0;
+
     // PAX DETAIL MODAL
     function openDetailModal(type, index) {
+        currentPaxType = type;
+        currentPaxIndex = index;
         document.getElementById('pax-detail-title').innerText = `Data ${type} ${index}`;
+        
+        // Load existing data if available
+        const key = `${type}_${index}`;
+        if (passengerDetails[key]) {
+            document.getElementById('det-nama').value = passengerDetails[key].nama || '';
+            document.getElementById('det-gender').value = passengerDetails[key].gender || 'L';
+            document.getElementById('det-dob').value = passengerDetails[key].dob || '';
+        } else {
+            document.getElementById('det-nama').value = '';
+            document.getElementById('det-gender').value = 'L';
+            document.getElementById('det-dob').value = '';
+        }
+        
         // Set date limits based on type
         const dobIn = document.getElementById('det-dob');
         const now = new Date();
@@ -5788,9 +6084,73 @@
         document.getElementById('modal-pax-detail').style.display = 'flex';
     }
     function closeDetailModal() { document.getElementById('modal-pax-detail').style.display = 'none'; }
+    
+    function validatePassengerData() {
+        // Check if all required passenger information is filled
+        const requiredPassengers = [];
+        const types = [
+            { type: 'Dewasa', count: currentPax.adult },
+            { type: 'Anak', count: currentPax.child },
+            { type: 'Bayi', count: currentPax.infant }
+        ];
+        
+        for (const { type, count } of types) {
+            for (let i = 1; i <= count; i++) {
+                requiredPassengers.push(`${type}_${i}`);
+            }
+        }
+        
+        // Check each required passenger
+        for (const key of requiredPassengers) {
+            const pax = passengerDetails[key];
+            if (!pax || !pax.nama || !pax.gender || !pax.dob) {
+                showValidationModal(
+                    "Data Penumpang Belum Lengkap",
+                    `Silakan isi informasi ${key.replace('_', ' ')} terlebih dahulu.`
+                );
+                return false;
+            }
+        }
+        
+        // All passengers have complete data
+        showScreen('scr-payment');
+        return true;
+    }
+    
     function saveDetail() {
-        alert("Data berhasil disimpan!");
+        const nama = document.getElementById('det-nama').value.trim();
+        const gender = document.getElementById('det-gender').value;
+        const dob = document.getElementById('det-dob').value;
+        
+        if (!nama) {
+            showValidationModal("Data Tidak Lengkap", "Nama lengkap harus diisi!");
+            return;
+        }
+        if (!dob) {
+            showValidationModal("Data Tidak Lengkap", "Tanggal lahir harus diisi!");
+            return;
+        }
+        
+        const key = `${currentPaxType}_${currentPaxIndex}`;
+        passengerDetails[key] = { nama, gender, dob };
+        
+        // Update the passenger item display
+        updatePassengerItemDisplay(currentPaxType, currentPaxIndex, nama);
+        
         closeDetailModal();
+    }
+    
+    function updatePassengerItemDisplay(type, index, nama) {
+        // Find the item by id and update the status
+        const itemId = `pax-item-${type}-${index}`;
+        const item = document.getElementById(itemId);
+        if (item) {
+            const statusDiv = item.querySelector('.pax-status');
+            if (statusDiv) {
+                statusDiv.innerHTML = `<b>${nama}</b>`;
+                statusDiv.style.color = 'var(--tv-text)';
+            }
+        }
     }
 
     // PAYMENT GUIDE
@@ -5813,7 +6173,27 @@
                 <div class="va-number">${m.number}</div>
             `;
         } else {
-            html += `<div style="font-weight:bold; margin:20px 0;">Silakan masukkan detail Kartu Kredit Anda.</div>`;
+            html += `
+                <div style="font-weight:bold; margin:20px 0;">Masukkan Detail Kartu Kredit</div>
+                <div class="input-group">
+                    <label>Nama Pemilik Kartu</label>
+                    <div><input type="text" id="cc-holder" placeholder="Nama sesuai kartu" style="border:none; outline:none; font-size:15px; width:100%; font-weight:500; background:transparent;"></div>
+                </div>
+                <div class="input-group">
+                    <label>Nomor Kartu</label>
+                    <div><input type="text" id="cc-number" placeholder="1234 5678 9012 3456" style="border:none; outline:none; font-size:15px; width:100%; font-weight:500; background:transparent;" maxlength="19"></div>
+                </div>
+                <div style="display:flex; gap:12px;">
+                    <div class="input-group" style="flex:1">
+                        <label>Berlaku Hingga</label>
+                        <div><input type="text" id="cc-expiry" placeholder="MM/YY" style="border:none; outline:none; font-size:15px; width:100%; font-weight:500; background:transparent;" maxlength="5"></div>
+                    </div>
+                    <div class="input-group" style="flex:1">
+                        <label>CVV</label>
+                        <div><input type="text" id="cc-cvv" placeholder="123" style="border:none; outline:none; font-size:15px; width:100%; font-weight:500; background:transparent;" maxlength="3"></div>
+                    </div>
+                </div>
+            `;
         }
 
         html += `
@@ -5832,6 +6212,20 @@
 
     // FINALIZE
     function finalizeBooking() {
+        // Validate credit card if selected
+        const m = paymentData[selectedPayment];
+        if (m.type === "CC") {
+            const ccHolder = document.getElementById('cc-holder').value.trim();
+            const ccNumber = document.getElementById('cc-number').value.trim();
+            const ccExpiry = document.getElementById('cc-expiry').value.trim();
+            const ccCVV = document.getElementById('cc-cvv').value.trim();
+            
+            if (!ccHolder || !ccNumber || !ccExpiry || !ccCVV) {
+                showValidationModal("Data Tidak Lengkap", "Harap lengkapi semua data kartu kredit!");
+                return;
+            }
+        }
+        
         document.getElementById('tick-route').innerText = `${document.getElementById('in-dari').value} → ${document.getElementById('in-ke').value}`;
         document.getElementById('tick-dates').innerText = `${document.getElementById('date-pergi').value} - ${document.getElementById('date-pulang').value}`;
         document.getElementById('tick-pax').innerText = document.getElementById('display-pax').value;
@@ -5850,6 +6244,20 @@
                 <div><b>${selectedBundle.activity}</b><br><span style="font-size:12px;">Tiket Terusan</span></div>
             </div>
         `;
+        
+        // Add notification with booking details
+        const totalPax = currentPax.adult + currentPax.child + currentPax.infant;
+        const totalPrice = selectedBundle.price * totalPax;
+        addNotification({
+            dari: document.getElementById('in-dari').value,
+            ke: document.getElementById('in-ke').value,
+            airline: selectedBundle.airline,
+            hotel: selectedBundle.hotel,
+            activity: selectedBundle.activity,
+            totalPax: totalPax,
+            totalPrice: totalPrice,
+            discountPercentage: selectedBundle.discount_percentage
+        });
         
         showScreen('scr-ticket');
     }
