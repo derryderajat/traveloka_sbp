@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Budget Planning - POC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #f2c94c;
+            --bg: #fafafa;
+            --text: #333;
+            --border: #ddd;
+        }
+        body { margin: 0; background: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; }
+        #app-container { width: 100%; max-width: 414px; height: 100vh; background: var(--bg); position: relative; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .screen { display: none; height: 100%; overflow-y: auto; padding-bottom: 70px; background: #fff; box-sizing: border-box; }
+        .screen.active { display: block; }
+        
+        /* Header */
+        .header { padding: 20px; font-size: 18px; font-weight: bold; border-bottom: 1px solid var(--border); background: #fff; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 15px; }
+        .back-btn { cursor: pointer; color: #555; padding: 5px; }
+        
+        /* Utility Classes */
+        .p-4 { padding: 20px; }
+        .mb-4 { margin-bottom: 16px; }
+        .flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .align-center { align-items: center; }
+        .text-center { text-align: center; }
+        .bold { font-weight: bold; }
+        
+        /* Inputs & Buttons */
+        input, select { width: 100%; padding: 12px; margin-top: 5px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 14px; background: #fff; }
+        .btn { width: 100%; padding: 15px; border: none; background: var(--primary); color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.2s; box-sizing: border-box; }
+        .btn:active { opacity: 0.8; transform: scale(0.98); }
+        
+        /* Home Screen */
+        .search-bar { display: flex; gap: 10px; margin-bottom: 25px; }
+        .search-input { flex: 1; padding: 12px 15px; border-radius: 20px; border: 1px solid var(--border); background: #f5f5f5; color: #888; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .icon-btn { width: 45px; height: 45px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; background: #fff; color: #555; }
+        .grid-8 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 40px; }
+        .circle { width: 55px; height: 55px; border-radius: 50%; background: #eee; margin: auto; display: flex; align-items: center; justify-content: center; color: #aaa; }
+        .smart-banner { border: 2px solid #333; padding: 40px 20px; text-align: center; border-radius: 12px; font-size: 22px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; }
+        .smart-banner:active { background: #f0f0f0; }
+        
+        /* Bottom Nav */
+        .bottom-nav { position: absolute; bottom: 0; left: 0; width: 100%; background: #fff; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+        .nav-item { text-align: center; color: #888; font-size: 11px; cursor: pointer; flex: 1; }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
+        .nav-item.active { color: #000; }
+
+        /* Form Screen */
+        .input-group { display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); padding: 12px 0; }
+        .input-group i { width: 24px; text-align: center; color: #555; font-size: 18px; }
+        .input-group input { border: none; margin: 0; padding: 5px 0; outline: none; background: transparent; flex: 1; font-size: 16px; color: #333; }
+        .input-group .label { font-size: 12px; color: #888; margin-bottom: 2px; }
+
+        /* Results Screen */
+        .card { border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-bottom: 15px; background: #fff; }
+        .result-row { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid #eee; margin-bottom: 10px; }
+        .change-btn { color: #0066cc; font-size: 14px; cursor: pointer; font-weight: bold; }
+        .summary-box { background: #f9f9f9; padding: 15px; border-radius: 10px; border: 1px solid #eee; }
+
+        /* Payment Screen */
+        .voucher-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .voucher-box { border: 1px solid var(--border); height: 40px; border-radius: 6px; background: #fafafa; }
+        
+        /* Success Screen */
+        .success-icon { font-size: 60px; color: #4caf50; margin-bottom: 15px; }
+        .promo-card { border: 1px solid var(--border); border-radius: 8px; display: flex; padding: 12px; gap: 15px; margin-bottom: 12px; background: #fff; }
+        .promo-img { width: 60px; height: 60px; border: 1px solid var(--border); border-radius: 6px; }
+        .strike { text-decoration: line-through; color: #999; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+
+    <!-- Screen 0: Login -->
+    <div id="screen-login" class="screen active">
+        <div class="p-4" style="margin-top: 60px; text-align: center;">
+            <i class="fa-solid fa-plane-departure" style="font-size: 50px; color: var(--text); margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 5px;">Travel App</h2>
+            <p style="color: #666; margin-top: 0;">Smart Budget Planning</p>
+            <div style="text-align: left; margin-top: 40px;">
+                <label class="bold" style="font-size:14px;">Email</label>
+                <input type="email" placeholder="Masukkan email anda" value="user@email.com">
+                <label class="bold" style="font-size:14px;">Password</label>
+                <input type="password" placeholder="Masukkan password" value="password123">
+                <button class="btn" style="margin-top: 20px;" onclick="nav('screen-home')">Login</button>
+            </div>
+            <p style="color: #888; font-size: 14px; margin-top: 20px;">Belum punya akun? <span style="color:#000; font-weight:bold;">Daftar</span></p>
+        </div>
+    </div>
+
+    <!-- Screen 1: Home -->
+    <div id="screen-home" class="screen">
+        <div class="p-4">
+            <div class="search-bar">
+                <div class="search-input"><i class="fa-solid fa-magnifying-glass"></i> Cari destinasi, hotel...</div>
+                <div class="icon-btn"><i class="fa-solid fa-percent"></i></div>
+                <div class="icon-btn"><i class="fa-regular fa-bell"></i></div>
+            </div>
+            
+            <div class="grid-8">
+                <div class="circle"><i class="fa-solid fa-plane"></i></div>
+                <div class="circle"><i class="fa-solid fa-building"></i></div>
+                <div class="circle"><i class="fa-solid fa-train"></i></div>
+                <div class="circle"><i class="fa-solid fa-bus"></i></div>
+                <div class="circle"><i class="fa-solid fa-car"></i></div>
+                <div class="circle"><i class="fa-solid fa-ticket"></i></div>
+                <div class="circle"><i class="fa-solid fa-utensils"></i></div>
+                <div class="circle"><i class="fa-solid fa-ellipsis"></i></div>
+            </div>
+
+            <div class="smart-banner" onclick="nav('screen-form')">
+                SMART BUDGET<br>PLANNING
+            </div>
+        </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-item active"><i class="fa-solid fa-house"></i>Home</div>
+            <div class="nav-item"><i class="fa-regular fa-compass"></i>Explore</div>
+            <div class="nav-item"><i class="fa-solid fa-book"></i>Booking</div>
+            <div class="nav-item"><i class="fa-regular fa-bookmark"></i>Saved</div>
+            <div class="nav-item"><i class="fa-regular fa-user"></i>Account</div>
+        </div>
+    </div>
+
+    <!-- Screen 2: Form -->
+    <div id="screen-form" class="screen">
+        <div class="header">
+            <i class="fa-solid fa-arrow-left back-btn" onclick="nav('screen-home')"></i> Smart Budget Planning
+        </div>
+        <div class="p-4">
+            <div class="input-group">
+                <i class="fa-solid fa-plane-departure"></i>
+                <div style="flex:1">
+                    <div class="label">From</div>
+                    <input type="text" placeholder="Asal Keberangkatan" value="Jakarta (CGK)">
+                </div>
+            </div>
+            <div class="input-group">
+                <i class="fa-solid fa-plane-arrival"></i>
+                <div style="flex:1">
+                    <div class="label">To</div>
+                    <input type="text" placeholder="Tujuan Destinasi" value="Bali (DPS)">
+                </div>
+            </div>
+            <div class="input-group">
+                <i class="fa-regular fa-calendar-days"></i>
+                <div style="flex:1">
+                    <div class="label">Departure Date</div>
+                    <input type="date">
+                </div>
+            </div>
+            <div class="input-group">
+                <i class="fa-regular fa-calendar-check"></i>
+                <div style="flex:1">
+                    <div class="label">Return Date</div>
+                    <input type="date">
+                </div>
+            </div>
+            <div class="input-group">
+                <i class="fa-solid fa-user-group"></i>
+                <div style="flex:1">
+                    <div class="label">Passengers</div>
+                    <input type="number" placeholder="Jumlah Penumpang" value="2">
+                </div>
+            </div>
+            <div class="input-group" style="border-bottom: none;">
+                <i class="fa-solid fa-money-bill-wave"></i>
+                <div style="flex:1">
+                    <div class="label">Budget</div>
+                    <input type="text" placeholder="Rp." value="5.000.000">
+                </div>
+            </div>
+            
+            <button class="btn" style="margin-top: 40px; border: 1px solid #000;" onclick="nav('screen-result')">Find Destination with smart budget planning</button>
+        </div>
+    </div>
+
+    <!-- Screen 3: Result -->
+    <div id="screen-result" class="screen">
+        <div class="header">
+            <i class="fa-solid fa-arrow-left back-btn" onclick="nav('screen-form')"></i> From - to
+        </div>
+        <div class="p-4">
+            <div class="card">
+                <div class="result-row">
+                    <div class="bold"><i class="fa-solid fa-plane" style="width:25px;"></i> Your flight</div>
+                    <div class="change-btn">Change</div>
+                </div>
+                <div style="font-size:14px; color:#555;">
+                    <div style="margin-bottom:8px;"><i class="fa-regular fa-circle" style="font-size:10px; margin-right:8px;"></i> CGK 08:00 - DPS 10:50</div>
+                    <div><i class="fa-regular fa-circle" style="font-size:10px; margin-right:8px;"></i> DPS 14:00 - CGK 14:50</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="result-row">
+                    <div class="bold"><i class="fa-solid fa-building" style="width:25px;"></i> Your hotel</div>
+                    <div class="change-btn">Change</div>
+                </div>
+                <div style="font-size:14px; color:#555;">
+                    <div><i class="fa-regular fa-square" style="font-size:12px; margin-right:8px;"></i> Bali Resort & Spa (3 Nights)</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="result-row">
+                    <div class="bold"><i class="fa-brands fa-fort-awesome" style="width:25px;"></i> Your destination</div>
+                    <div class="change-btn">Change</div>
+                </div>
+                <div style="font-size:14px; color:#555;">
+                    <div style="margin-bottom:8px;"><i class="fa-regular fa-square" style="font-size:12px; margin-right:8px;"></i> Uluwatu Temple Tour</div>
+                    <div><i class="fa-regular fa-square" style="font-size:12px; margin-right:8px;"></i> Kuta Beach Sunset</div>
+                </div>
+            </div>
+
+            <div class="summary-box flex justify-between align-center" style="margin-top: 30px;">
+                <div>
+                    <div style="font-size:18px; margin-bottom:5px;">
+                        <i class="fa-solid fa-plane"></i> + <i class="fa-solid fa-building"></i> + <i class="fa-brands fa-fort-awesome"></i>
+                    </div>
+                    <div style="font-size:12px; color:#555;">Flight + Hotel + Destination</div>
+                    <div class="bold" style="font-size:13px; margin-top:2px;">3 night(s)</div>
+                </div>
+                <div class="text-center">
+                    <div style="color:#d32f2f; font-size:12px; font-weight:bold; margin-bottom:3px;">Save 10%</div>
+                    <div class="bold" style="font-size:18px;">Rp 4.500.000</div>
+                </div>
+            </div>
+
+            <button class="btn" style="margin-top: 25px; border: 1px solid #000;" onclick="nav('screen-details')">Next</button>
+        </div>
+    </div>
+
+    <!-- Screen 4: Fill Details -->
+    <div id="screen-details" class="screen">
+        <div class="header">
+            <i class="fa-solid fa-arrow-left back-btn" onclick="nav('screen-result')"></i> Fill in Details
+        </div>
+        <div class="p-4">
+            <div class="flex justify-between mb-4" style="gap:10px;">
+                <div class="card" style="flex:1; text-align:center; padding:15px 5px; margin:0; font-size:13px; border:1px solid #000;">flights</div>
+                <div class="card" style="flex:1; text-align:center; padding:15px 5px; margin:0; font-size:13px; border:1px solid #000;">hotel</div>
+                <div class="card" style="flex:1; text-align:center; padding:15px 5px; margin:0; font-size:13px; border:1px solid #000;">destination</div>
+            </div>
+
+            <div class="card flex justify-between align-center" style="cursor:pointer; background:#fff; border:1px solid #000; margin-top: 20px;">
+                <div class="bold"><i class="fa-regular fa-envelope" style="margin-right:10px;"></i> isi detail kontak</div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <div class="input-group">
+                    <i class="fa-regular fa-user"></i>
+                    <div style="flex:1">
+                        <div class="label" style="font-size:14px; color:#333;">Adult 1</div>
+                        <input type="text" placeholder="Nama Lengkap" value="Derry Derajat" style="border:none; border-bottom:1px solid #ccc; border-radius:0; padding-left:0; margin-bottom:0;">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <i class="fa-regular fa-user"></i>
+                    <div style="flex:1">
+                        <div class="label" style="font-size:14px; color:#333;">Adult 2</div>
+                        <input type="text" placeholder="Nama Lengkap" style="border:none; border-bottom:1px solid #ccc; border-radius:0; padding-left:0; margin-bottom:0;">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" style="margin-top: 40px; border: 1px solid #000;" onclick="nav('screen-payment')">Continue</button>
+        </div>
+    </div>
+
+    <!-- Screen 5: Payment -->
+    <div id="screen-payment" class="screen">
+        <div class="header">
+            <i class="fa-solid fa-arrow-left back-btn" onclick="nav('screen-details')"></i> Detail flights, hotel, dll
+        </div>
+        <div class="p-4">
+            <div class="card" style="border: 1px solid #000; position: relative;">
+                <div style="height: 40px; margin-bottom:15px; overflow:hidden;">
+                    <svg width="100%" height="20" style="display:block; margin-top:20px;">
+                        <path d="M0 10 Q 15 0 30 10 T 60 10 T 90 10 T 120 10 T 150 10 T 180 10 T 210 10 T 240 10 T 270 10 T 300 10 T 330 10 T 360 10 T 390 10 T 420 10" stroke="#000" fill="transparent" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <div class="flex justify-between align-center" style="font-size:18px;">
+                    <div style="font-family: monospace;">total</div>
+                    <div style="font-family: monospace;">Rp. <span style="text-decoration: underline; text-decoration-style: wavy;">4.500.000</span></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px;">
+                <div class="bold" style="font-size:16px;">Voucher</div>
+                <div class="voucher-grid">
+                    <div class="voucher-box"></div>
+                    <div class="voucher-box"></div>
+                    <div class="voucher-box"></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px;">
+                <div class="bold" style="font-size:16px; margin-bottom:10px;">Metode Pembayaran</div>
+                <select style="border: 1px solid #000; font-size:16px; padding: 15px; appearance: none; background: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center; background-color: #fff;">
+                    <option>VA / Digital</option>
+                    <option>Kartu Kredit</option>
+                    <option>Transfer Bank</option>
+                </select>
+                <div style="border:1px solid #000; border-top:none; border-radius: 0 0 8px 8px; margin-top:-20px; padding:15px; padding-top:25px; background:#fafafa;">
+                    <div style="height:1px; background:#000; margin-bottom:10px;"></div>
+                    <div style="height:1px; background:#000; margin-bottom:10px;"></div>
+                    <div style="height:1px; background:#000; margin-bottom:10px; width:70%;"></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px;">
+                <div class="bold" style="font-size:16px; margin-bottom:10px;">Rincian</div>
+                <div style="height:1px; background:#000; margin-bottom:10px; width:30%;"></div>
+                <div style="height:1px; background:#000; margin-bottom:10px; width:20%;"></div>
+            </div>
+
+            <button class="btn" style="margin-top: 30px; border: 1px solid #000; background: transparent; letter-spacing:1px;" onclick="nav('screen-success')">BAYAR</button>
+        </div>
+    </div>
+
+    <!-- Screen 6: Success -->
+    <div id="screen-success" class="screen">
+        <div class="p-4" style="margin-top: 30px;">
+            <div style="font-size: 24px; font-weight: bold; border-left: 2px solid #000; padding-left: 15px; margin-bottom: 20px;">
+                Pembayaran<br>berhasil !
+            </div>
+            <p style="color:#333; font-size:16px; margin-bottom: 40px;">silahkan cek email anda<br>untuk melihat e-ticket</p>
+
+            <div style="text-align:left;" class="mb-4">
+                <div class="bold" style="font-size:20px; margin-bottom: 15px;">Promo</div>
+                
+                <div class="promo-card" style="border: 1px solid #000; align-items:center;">
+                    <div class="promo-img"></div>
+                    <div style="flex:1;">
+                        <div class="strike" style="color:#000;">Rp 500.000</div>
+                        <div>Rp 350.000</div>
+                    </div>
+                    <div class="promo-img" style="width:40px; height:50px;"></div>
+                    <div style="flex:1; padding-left:10px; border-left: 1px solid #000;">
+                        <div class="strike" style="color:#000;">Rp 200.000</div>
+                        <div>Rp 150.000</div>
+                    </div>
+                </div>
+                
+                <div class="promo-card" style="border: 1px solid #000; align-items:center;">
+                    <div class="promo-img"></div>
+                    <div style="flex:1;">
+                        <div class="strike" style="color:#000;">Rp 150.000</div>
+                        <div>Rp 99.000</div>
+                    </div>
+                    <div class="promo-img" style="width:40px; height:50px;"></div>
+                    <div style="flex:1; padding-left:10px; border-left: 1px solid #000;">
+                        <div class="strike" style="color:#000;">Rp 100.000</div>
+                        <div>Rp 75.000</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" style="background:transparent; border: 1px solid #000; margin-top:30px;" onclick="nav('screen-home')">kembali ke beranda</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Set default date logic
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    if(dateInputs.length >= 2) {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 3);
+        dateInputs[0].valueAsDate = today;
+        dateInputs[1].valueAsDate = tomorrow;
+    }
+
+    function nav(screenId) {
+        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        window.scrollTo(0, 0);
+    }
+</script>
+
+</body>
+</html>
