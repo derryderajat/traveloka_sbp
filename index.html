@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -160,14 +161,14 @@
         }
         .smart-banner-correct::after {
              /* Abstract shape decoration */
-             content: '';
+             content: '\f0d0';
+             font-family: "Font Awesome 6 Free";
+             font-weight: 900;
              position: absolute;
-             right: -20px;
-             bottom: -20px;
-             width: 100px;
-             height: 100px;
-             background: rgba(255,255,255,0.1);
-             transform: rotate(45deg);
+             right: -10px;
+             bottom: -10px;
+             font-size: 80px;
+             opacity: 0.15;
         }
         .smart-banner-correct h3 { font-size: 18px; margin-bottom: 5px; position: relative; z-index: 2;}
         .smart-banner-correct p { font-size: 12px; opacity: 0.9; margin-bottom: 12px; position: relative; z-index: 2;}
@@ -199,9 +200,12 @@
 
 <div class="app-wrapper">
     
+    <!-- SCREEN 1: HOME -->
     <div id="scr-home" class="screen active">
+        <!-- Background Blue Curve -->
         <div class="home-top-bg"></div>
         
+        <!-- Header Elements -->
         <div class="home-header-content">
             <div style="font-size:24px; font-weight:bold;">traveloka</div>
             <div style="display:flex; gap:15px; font-size:20px;">
@@ -210,6 +214,7 @@
             </div>
         </div>
         
+        <!-- Main Grid Menu (Fix: Now it's the top card) -->
         <div class="main-menu-grid">
             <div class="menu-item"><div class="menu-icon" style="background:#0194f3"><i class="fa-solid fa-plane"></i></div>Tiket Pesawat</div>
             <div class="menu-item"><div class="menu-icon" style="background:#235d9f"><i class="fa-solid fa-hotel"></i></div>Hotel</div>
@@ -221,17 +226,21 @@
             <div class="menu-item"><div class="menu-icon" style="background:#687176"><i class="fa-solid fa-ellipsis"></i></div>Lainnya</div>
         </div>
 
+        <!-- Smart Banner (Fix: Now below the grid menu, matching the second image) -->
         <div class="smart-banner-correct" onclick="showScreen('scr-form')">
             <h3>Smart Budget Planning</h3>
             <p>Rencanakan liburan impian sesuai budget Anda secara otomatis. Coba Sekarang!</p>
             <button class="btn-smart">Mulai Perencanaan <i class="fa-solid fa-arrow-right"></i></button>
         </div>
 
+        <!-- Promo Section -->
         <div style="padding: 10px 15px 0;">
             <h4 style="margin-bottom:10px;">Promo Terpopuler</h4>
             <div class="card" style="height: 150px; background: url('https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=400&q=80') center/cover; border-radius: 12px; margin: 0; border: none;"></div>
-            <br><br><br><br> </div>
+            <br><br><br><br> <!-- Space for bottom nav -->
+        </div>
         
+        <!-- Bottom Navigation -->
         <div class="bottom-nav">
             <div class="nav-tab active"><i class="fa-solid fa-house"></i>Awal</div>
             <div class="nav-tab"><i class="fa-solid fa-compass"></i>Simpan</div>
@@ -240,6 +249,7 @@
         </div>
     </div>
 
+    <!-- SCREEN 2: FORM -->
     <div id="scr-form" class="screen">
         <div class="tv-header">
             <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-home')"></i>
@@ -295,6 +305,7 @@
         </div>
     </div>
 
+    <!-- SCREEN 3: RESULTS -->
     <div id="scr-results" class="screen">
         <div class="tv-header">
             <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-form')"></i>
@@ -308,6 +319,7 @@
         <div id="results-list"></div>
     </div>
 
+    <!-- SCREEN 4: BOOKING -->
     <div id="scr-booking" class="screen">
         <div class="tv-header">
             <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-results')"></i>
@@ -315,13 +327,15 @@
         </div>
         
         <div class="card" id="booking-pax-list">
-            </div>
+            <!-- Dynamic Content -->
+        </div>
 
         <div style="padding:15px;">
             <button class="btn-orange" onclick="showScreen('scr-payment')">Lanjut ke Pembayaran</button>
         </div>
     </div>
 
+    <!-- SCREEN 5: PAYMENT -->
     <div id="scr-payment" class="screen">
         <div class="tv-header">
             <i class="fa-solid fa-arrow-left" onclick="showScreen('scr-booking')"></i>
@@ -331,7 +345,8 @@
         <div class="card">
             <div style="font-weight:bold; margin-bottom:15px;">Pilih Metode Pembayaran</div>
             <div id="payment-methods-list">
-                </div>
+                <!-- Dynamic Content -->
+            </div>
         </div>
 
         <div style="padding:15px;">
@@ -339,6 +354,7 @@
         </div>
     </div>
 
+    <!-- SCREEN 6: GUIDE / VA -->
     <div id="scr-guide" class="screen">
         <div class="tv-header">
             <i class="fa-solid fa-xmark" onclick="showScreen('scr-payment')"></i>
@@ -346,13 +362,15 @@
         </div>
         
         <div id="guide-body">
-            </div>
+            <!-- Dynamic Content -->
+        </div>
 
         <div style="padding:15px; position:fixed; bottom:0; width:100%; max-width:480px; background:white; border-top:1px solid #ddd;">
             <button class="btn-orange" onclick="finalizeBooking()">SAYA SUDAH BAYAR</button>
         </div>
     </div>
 
+    <!-- SCREEN 7: TICKET -->
     <div id="scr-ticket" class="screen">
         <div style="text-align:center; padding:40px 20px 20px;">
             <i class="fa-solid fa-circle-check" style="font-size:60px; color:#22c55e;"></i>
@@ -381,6 +399,7 @@
         </div>
     </div>
 
+    <!-- MODAL: PASSENGERS -->
     <div id="modal-pax" class="modal-overlay">
         <div class="modal-content">
             <h3 style="margin-bottom:20px;">Jumlah Penumpang</h3>
@@ -426,6 +445,7 @@
         </div>
     </div>
 
+    <!-- MODAL: PAX DETAILS -->
     <div id="modal-pax-detail" class="modal-overlay">
         <div class="modal-content">
             <h3 id="pax-detail-title" style="margin-bottom:20px;">Lengkapi Data Penumpang</h3>
